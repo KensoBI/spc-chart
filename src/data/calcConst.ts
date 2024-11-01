@@ -1,20 +1,20 @@
-type CalcConstProp = {
+type ControlChartConstantLookup = {
   [sample: number]: number[];
 };
 
-export const calcConstIds = {
-  C4_xbar_sigma: 0,
-  d2_xbar_range: 1,
-  d3_range_limit: 2,
-  a2_xbar_limit_range: 3,
-  a3_xbar_limit_sigma: 4,
-  b3_sigma_lcl: 5,
-  b4_sigma_ucl: 6,
-  d3_range_lcl: 7,
-  d4_range_ucl: 8,
-};
+export enum ControlChartConstants {
+  C4_xbar_sigma,
+  d2_xbar_range,
+  d3_range_limit,
+  a2_xbar_limit_range,
+  a3_xbar_limit_sigma,
+  b3_sigma_lcl,
+  b4_sigma_ucl,
+  d3_range_lcl,
+  d4_range_ucl,
+}
 
-export const calcConst: CalcConstProp = {
+export const ControlChartConstantLookupTable: ControlChartConstantLookup = {
   //samlpe | C4_xbar_sigma | d2_xbar_range | d3_range_limit | a2_xbar_limit_range | a3_xbar_limit_sigma | b3_sigma_lcl | b4_sigma_ucl | d3_range_lcl | d4_range_ucl
   2: [0.7979, 1.128, 0.853, 1.88, 2.659, 0.0, 3.267, 0.0, 3.267],
   3: [0.8862, 1.693, 0.888, 1.023, 1.954, 0.0, 2.568, 0.0, 2.574],
@@ -42,6 +42,6 @@ export const calcConst: CalcConstProp = {
   25: [0.9896, 3.931, 0.708, 0.153, 0.606, 0.565, 1.435, 0.459, 1.541],
 };
 
-export function getCalcConst(sample: number, id: keyof typeof calcConstIds): number {
-  return calcConst[sample][calcConstIds[id]];
+export function getControlChartConstant(sample: number, id: ControlChartConstants): number {
+  return ControlChartConstantLookupTable[sample][id];
 }

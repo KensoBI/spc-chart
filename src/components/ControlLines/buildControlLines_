@@ -1,0 +1,224 @@
+import { DataFrame, FieldColorModeId, FieldType, ThresholdsConfig, ThresholdsMode } from '@grafana/data';
+import { ControlLine, Options } from 'panelcfg';
+import { controlLineReducers } from 'data/spcReducers';
+//import { Flag, LimitAnnotation, Region } from './LimitAnnotations';
+import { PositionInput } from 'types';
+import { GraphFieldConfig, GraphGradientMode, GraphThresholdsStyleConfig } from '@grafana/ui';
+import { GraphDrawStyle, GraphTransform, LineInterpolation } from '@grafana/schema';
+
+// const createControlLineField = (cl: ControlLine, timeFields: any[]) => ({
+//   name: cl.name,
+//   values: timeFields.map(() => cl.position),
+//   config: {
+//     color: { mode: FieldColorModeId.Fixed, fixedColor: cl.lineColor },
+//     custom: { lineWidth: cl.lineWidth },
+//   },
+//   type: FieldType.number,
+// });
+
+export default function buildControlLine(series: DataFrame[], options: Options): DataFrame[] {
+  const computedControlLines = addComputedControlLines(series, options);
+  const nonComputedControlLines = addNonComputedControlLines(series, options);
+
+  const controlLines = computedControlLines.concat(nonComputedControlLines).filter((p) => p.position);
+
+  if (!controlLines.length) {
+    return [];
+  }
+
+  const allIndexes = series.map((_, index) => index);
+  //const limits: DataFrame[] = [];
+
+  // Sort controlLines by position
+  controlLines.sort((a, b) => a.position! - b.position!);
+
+  const timeFields = {
+    name: 'time',
+    type: FieldType.time,
+    values: [new Date().toISOString()],
+    config: {},
+  };
+  const constantDataFrame: DataFrame = {
+    name: 'control limits',
+    fields: [timeFields],
+    length: 1,
+  };
+
+  controlLines.forEach((cl, index) => {
+    if (!allIndexes.includes(cl.seriesIndex)) {
+      return;
+    }
+
+    // const thresholds: ThresholdsConfig = {
+    //   mode: ThresholdsMode.Absolute,
+    //   steps: [],
+    // };
+
+    // if (cl.fillDirection === -1) {
+    //   // Add lower region
+    //   const prevControlLine = controlLines[index - 1];
+
+    //   thresholds.steps = [
+    //     {
+    //       color: cl.lineColor,
+    //       value: prevControlLine ? prevControlLine.position : -Infinity,
+    //     },
+    //     {
+    //       color: 'transparent',
+    //       value: cl.position,
+    //     },
+    //   ];
+    // } else if (cl.fillDirection === 1) {
+    //   const nextControlLine = controlLines[index + 1];
+    //   thresholds.steps = [
+    //     {
+    //       color: 'transparent',
+    //       value: cl.position,
+    //     },
+    //     {
+    //       color: cl.lineColor,
+    //       value: cl.position,
+    //     },
+    //     {
+    //       color: 'transparent',
+    //       value: nextControlLine ? nextControlLine.position : Infinity,
+    //     },
+    //   ];
+    // }
+
+    // const thresholdsStyle: GraphThresholdsStyleConfig = {
+    //   // known issue with the enum type: GraphTresholdsStyleMode which does not exist for grafana >= 10.4.x
+    //   // raw string is used instead
+    //   mode: 'area' as any,
+    // };
+
+    const custom: GraphFieldConfig = {
+      transform: GraphTransform.Constant, // this will allow grafana to transform this field into a constant
+      lineWidth: cl.lineWidth,
+      gradientMode: GraphGradientMode.None,
+      lineInterpolation: LineInterpolation.Smooth,
+      drawStyle: GraphDrawStyle.Line,
+      //thresholdsStyle,
+      //pointSize: pointSize,
+      //fillOpacity: cl.fillOpacity,
+    };
+
+    const constant = {
+      name: cl.name,
+      type: FieldType.number,
+      values: [cl.position],
+      config: {
+        custom,
+        color: {
+          mode: FieldColorModeId.Fixed,
+          fixedColor: cl.lineColor,
+          fillOpacity: cl.fillOpacity,
+          gradientMode: GraphGradientMode.Opacity,
+        },
+        displayName: cl.name,
+        //thresholds: thresholds,
+      },
+    };
+
+    constantDataFrame.fields.push(constant);
+  });
+
+  return [constantDataFrame];
+}
+
+// export function buildControlLineFrames(config: LimitAnnotation[]): DataFrame[] {
+
+//   config.forEach((cl, index) => {
+
+//   };
+
+// }
+
+function addComputedControlLines(series: DataFrame[], options: Options): ControlLine[] {
+  if (!options.controlLines || options.controlLines.length === 0) {
+    return [];
+  }
+
+  // copy control lines to avoid mutating the original control line options.
+  const controlLines = options.controlLines.map((cl) => ({ ...cl }));
+
+  // grab id's of all computed reducers
+  const computedReducers = controlLineReducers.filter((p) => p.computed).map((p) => p.id);
+
+  // short circuite looping series if there are no computed control lines is provided options.
+  const computedControlLines = controlLines.filter((cl) => computedReducers.includes(cl.reducerId));
+  if (computedControlLines.length === 0) {
+    return [];
+  }
+
+  computedControlLines.forEach((cl) => {
+    let data = series.filter((frame) => {
+      return !options.featureQueryRefIds || !options.featureQueryRefIds.includes(frame.refId!);
+    });
+
+    if (cl.seriesIndex === undefined || cl.seriesIndex < 0 || cl.seriesIndex >= data.length) {
+      return;
+    }
+
+    const frame = data[cl.seriesIndex];
+    const numericFrames = frame.fields.filter((field) => field.type === FieldType.number && field.state?.calcs);
+
+    if (numericFrames.length > 0) {
+      // take first numeric frame
+      const calcs = numericFrames[0].state?.calcs;
+      if (!calcs) {
+        // no calcs cached, nothing to assign
+        return;
+      }
+
+      // if this control line was computed, grab computed value from calcs
+      if (computedReducers.includes(cl.reducerId)) {
+        cl.position = calcs[cl.reducerId];
+      }
+    }
+  });
+
+  return computedControlLines;
+}
+
+function addNonComputedControlLines(series: DataFrame[], options: Options): ControlLine[] {
+  if (!options.controlLines || options.controlLines.length === 0) {
+    return [];
+  }
+
+  // copy control lines to avoid mutating the original control line options.
+  const controlLines = options.controlLines.map((cl) => ({ ...cl }));
+
+  // grab id's of all non-computed reducers
+  const nonComputedReducers = controlLineReducers.filter((p) => !p.computed).map((p) => p.id);
+
+  // filter non-computed control lines
+  const nonComputedControlLines = controlLines.filter((cl) => nonComputedReducers.includes(cl.reducerId));
+
+  if (nonComputedControlLines.length === 0) {
+    return [];
+  }
+
+  series.map((frame, frameIndex) => {
+    const seriesControlLines = nonComputedControlLines.filter((c) => c.seriesIndex === frameIndex);
+    if (seriesControlLines.length === 0) {
+      return;
+    }
+
+    seriesControlLines.forEach((cl) => {
+      if (cl.positionInput === PositionInput.series) {
+        const field = frame.fields.find((f) => f.name === cl.field);
+
+        if (field && field.values.length > 0) {
+          const lastValue = field.values[field.values.length - 1];
+
+          if (typeof lastValue === 'number') {
+            cl.position = lastValue;
+          }
+        }
+      }
+    });
+  });
+
+  return nonComputedControlLines;
+}

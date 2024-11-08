@@ -113,7 +113,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
       field: '',
       positionInput: PositionInput.static,
       seriesIndex: seriesIndex,
-      lineWidth: 4,
+      lineWidth: 2,
       lineColor: reducer.color,
       fillDirection: 0,
       fillOpacity: 10,

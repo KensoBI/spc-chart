@@ -2,7 +2,15 @@ import React, { useMemo } from 'react';
 import { PanelProps, DashboardCursorSync } from '@grafana/data';
 import { config, PanelDataErrorView } from '@grafana/runtime';
 //import { TooltipDisplayMode, VizOrientation } from '@grafana/schema';
-import { EventBusPlugin, KeyboardPlugin, TimeSeries, usePanelContext } from '@grafana/ui';
+import {
+  EventBusPlugin,
+  KeyboardPlugin,
+  TimeSeries,
+  TooltipDisplayMode,
+  TooltipPlugin,
+  TooltipPlugin2,
+  usePanelContext,
+} from '@grafana/ui';
 //import { TimeRange2, TooltipHoverMode } from '@grafana/ui/src/components/uPlot/plugins/TooltipPlugin2';
 
 //import { VizTooltip } from '@grafana/ui'
@@ -54,11 +62,12 @@ export const TimeSeriesPanel = ({
     const controlLines = computeControlLine(samplesWithCalcs, optionsWithVars);
     const limitAnnotations = buildLimitAnnotations(samplesWithCalcs, controlLines);
     const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines);
+    const combined = samplesWithCalcs.concat(controlLineFrames);
+    const preped = prepareGraphableFields(combined, config.theme2, timeRange);
+    //const preped = prepareGraphableFields(samplesWithCalcs, config.theme2, timeRange);
+    //const allFrames = preped.concat(controlLineFrames);
 
-    const preped = prepareGraphableFields(samplesWithCalcs, config.theme2, timeRange);
-    const allFrames = preped.concat(controlLineFrames);
-
-    return { frames: allFrames, limitAnnotations };
+    return { frames: preped, limitAnnotations };
   }, [data.series, optionsWithVars, timeRange]);
 
   const timezones = useMemo(() => getTimezones(options.timezone, timeZone), [options.timezone, timeZone]);
@@ -103,6 +112,64 @@ export const TimeSeriesPanel = ({
             {cursorSync !== DashboardCursorSync.Off && (
               <EventBusPlugin config={uplotConfig} eventBus={eventBus} frame={alignedFrame} />
             )}
+            {/* {options.tooltip.mode !== TooltipDisplayMode.None && (
+              <TooltipPlugin2
+                config={uplotConfig}
+                hoverMode={
+                  options.tooltip.mode === TooltipDisplayMode.Single ? TooltipHoverMode.xOne : TooltipHoverMode.xAll
+                }
+                queryZoom={onChangeTimeRange}
+                clientZoom={true}
+                syncMode={cursorSync}
+                syncScope={eventsScope}
+                render={(u, dataIdxs, seriesIdx, isPinned = false, dismiss, timeRange2, viaSync) => {
+                  if (enableAnnotationCreation && timeRange2 != null) {
+                    setNewAnnotationRange(timeRange2);
+                    dismiss();
+                    return;
+                  }
+
+                  const annotate = () => {
+                    let xVal = u.posToVal(u.cursor.left!, 'x');
+
+                    setNewAnnotationRange({ from: xVal, to: xVal });
+                    dismiss();
+                  };
+
+                  return (
+                    // not sure it header time here works for annotations, since it's taken from nearest datapoint index
+                    <TimeSeriesTooltip
+                      series={alignedFrame}
+                      dataIdxs={dataIdxs}
+                      seriesIdx={seriesIdx}
+                      mode={viaSync ? TooltipDisplayMode.Multi : options.tooltip.mode}
+                      sortOrder={options.tooltip.sort}
+                      isPinned={isPinned}
+                      annotate={enableAnnotationCreation ? annotate : undefined}
+                      maxHeight={options.tooltip.maxHeight}
+                      replaceVariables={replaceVariables}
+                    />
+                  );
+                }}
+                maxWidth={options.tooltip.maxWidth}
+              />
+            )} */}
+            <div
+              style={{
+                maxWidth: options.tooltip.maxWidth ? `2px !important` : 'auto',
+                maxHeight: options.tooltip.maxHeight ? `2px !important` : 'auto',
+                overflow: 'hidden',
+              }}
+            >
+              <TooltipPlugin
+                frames={frames}
+                data={alignedFrame}
+                config={uplotConfig}
+                mode={options.tooltip.mode}
+                timeZone={timeZone}
+                sortOrder={options.tooltip.sort}
+              />
+            </div>
           </>
         );
       }}

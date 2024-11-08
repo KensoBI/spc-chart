@@ -32,7 +32,7 @@ export function buildControlLineFrame(series: DataFrame[], controlLines: Control
   const timeFields = {
     name: 'time',
     type: FieldType.time,
-    values: [new Date().toISOString()],
+    values: [new Date().toISOString()], //series[0].fields[0].values.map(() => new Date().toISOString()),
     config: {},
   };
   const constantDataFrame: DataFrame = {
@@ -57,7 +57,7 @@ export function buildControlLineFrame(series: DataFrame[], controlLines: Control
     const constant = {
       name: cl.name,
       type: FieldType.number,
-      values: [cl.position],
+      values: timeFields.values.map(() => cl.position),
       config: {
         custom,
         color: {

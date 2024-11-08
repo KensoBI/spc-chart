@@ -4,15 +4,15 @@ import { commonOptionsBuilder } from '@grafana/ui';
 import { TimeSeriesPanel } from './TimeSeriesPanel';
 import { TimezonesEditor } from './TimezonesEditor';
 import { defaultGraphConfig, getGraphFieldConfig } from './config';
-//import { graphPanelChangedHandler } from './migrations';
 import { FieldConfig, Options } from './panelcfg';
 import { SpcChartTyp } from 'types';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
+import { migrateOptions } from 'migrations';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(TimeSeriesPanel)
-  //.setPanelChangeHandler(graphPanelChangedHandler)
+  .setMigrationHandler(migrateOptions)
   .useFieldConfig(getGraphFieldConfig(defaultGraphConfig))
   .setPanelOptions((builder) => {
     builder.addSelect({
@@ -66,7 +66,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(TimeSeriesPanel)
       category: ['SPC'],
     });
 
-    commonOptionsBuilder.addTooltipOptions(builder, false, true);
+    commonOptionsBuilder.addTooltipOptions(builder, false, false);
     commonOptionsBuilder.addLegendOptions(builder);
     builder.addCustomEditor({
       id: 'timezone',

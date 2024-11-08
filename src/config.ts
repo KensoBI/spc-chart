@@ -165,7 +165,7 @@ export function getGraphFieldConfig(cfg: GraphFieldConfig, isTime = true): SetFi
           path: 'spanNulls',
           name: 'Connect null values',
           category: categoryStyles,
-          defaultValue: false,
+          defaultValue: true,
           editor: SpanNullsEditor,
           override: SpanNullsEditor,
           showIf: (config) => config.drawStyle === GraphDrawStyle.Line,

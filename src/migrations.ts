@@ -36,47 +36,10 @@ export const migrateOptions = (oldOptions: any): any => {
     legend: oldOptions.options.legend,
     tooltip: oldOptions.options.tooltip,
     featureQueryRefIds: [],
+    onSeriesColorChange: function (label: string, color: string): void {},
   };
   return newOptions;
 };
-
-// export const spcPanelChangedHandler: PanelTypeChangedHandler = (
-//   panel: PanelModel,
-//   prevPluginId: string,
-//   prevOptions: any,
-//   prevFieldConfig: any
-// ) => {
-//   // Check if we're migrating from the old SPC panel
-//   if (prevPluginId === 'kensobi-spc-panel' && prevOptions.constantsConfig) {
-//     const oldOptions = prevOptions as OldPanelOptions;
-
-//     // Create new panel options
-//     const newOptions: Options = {
-//       chartType: SpcChartTyp.none,
-//       subgroupSize: oldOptions.spcOptions?.sampleSize || 1,
-//       aggregationType: mapAggregationType(oldOptions.spcOptions?.aggregation),
-//       controlLines: migrateControlLines(oldOptions.constantsConfig?.items || []),
-//       legend: oldOptions.legend,
-//       tooltip: oldOptions.tooltip,
-//       featureQueryRefIds: [],
-//     };
-
-//     //todo remove old options
-//     //migrate nominal, lsl and usl
-//     if (oldOptions.nominal) {
-//     }
-
-//     if (oldOptions.lsl) {
-//     }
-
-//     if (oldOptions.usl) {
-//     }
-
-//     return newOptions;
-//   }
-
-//   return {};
-// };
 
 function mapAggregationType(oldAggregation: string): AggregationType {
   // Map old aggregation types to new ones

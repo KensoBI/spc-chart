@@ -1,8 +1,6 @@
 import { PanelPlugin } from '@grafana/data';
 import { commonOptionsBuilder } from '@grafana/ui';
 
-import { TimeSeriesPanel } from './TimeSeriesPanel';
-import { TimezonesEditor } from './TimezonesEditor';
 import { defaultGraphConfig, getGraphFieldConfig } from './config';
 import { FieldConfig, Options } from './panelcfg';
 import { SpcChartTyp } from 'types';
@@ -10,8 +8,10 @@ import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { migrateOptions } from 'migrations';
+import { TimezonesEditor } from 'components/options/TimezonesEditor';
+import { SpcChartPanel } from 'components/SpcChart';
 
-export const plugin = new PanelPlugin<Options, FieldConfig>(TimeSeriesPanel)
+export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
   .setMigrationHandler(migrateOptions)
   .useFieldConfig(getGraphFieldConfig(defaultGraphConfig))
   .setPanelOptions((builder) => {
@@ -76,6 +76,6 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(TimeSeriesPanel)
       editor: TimezonesEditor,
       defaultValue: undefined,
     });
-  })
-  //.setSuggestionsSupplier(new TimeSeriesSuggestionsSupplier())
-  .setDataSupport({ annotations: true, alertStates: true });
+  });
+//.setSuggestionsSupplier(new TimeSeriesSuggestionsSupplier())
+//.setDataSupport({ annotations: true, alertStates: true });

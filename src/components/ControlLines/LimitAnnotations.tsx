@@ -52,50 +52,65 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
   const [plot, setPlot] = useState<uPlot>();
   const annotationsRef = useRef<LimitAnnotation[]>();
+  const shouldRenderRef = useRef<boolean>(false);
   const bboxRef = useRef<DOMRect>();
+  const hooksInitialized = useRef(false);
 
   useEffect(() => {
     annotationsRef.current = annotations.sort((a, b) => typeToValue(b.type) - typeToValue(a.type));
   }, [annotations]);
 
   useLayoutEffect(() => {
-    config.addHook('init', (u) => {
-      setPlot(u);
-    });
+    shouldRenderRef.current = annotations && annotations.length > 0;
 
-    config.addHook('syncRect', (u, rect) => {
-      bboxRef.current = rect;
-    });
+    if (!hooksInitialized.current && shouldRenderRef.current) {
+      config.addHook('init', (u) => {
+        setPlot(u);
+      });
 
-    config.addHook('draw', (u) => {
-      if (!annotationsRef.current) {
-        return;
-      }
+      config.addHook('syncRect', (u, rect) => {
+        bboxRef.current = rect;
+      });
 
-      const ctx = u.ctx;
-      if (!ctx) {
-        return;
-      }
+      config.addHook('draw', drawAnnotations);
 
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
-      ctx.clip();
+      hooksInitialized.current = true;
+    } else if (shouldRenderRef.current) {
+      config.addHook('draw', drawAnnotations);
+    }
 
-      for (let i = 0; i < annotationsRef.current.length; i++) {
-        const entity = annotationsRef.current[i];
-        const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
-
-        if (entity.type === 'region') {
-          const yKey = config.scales[1].props.scaleKey;
-          renderRect(ctx, u, yKey, entity.timeStart, entity.timeEnd, lineColor, entity.fillOpacity);
-        }
-      }
-      ctx.restore();
-    });
-
-    return;
+    return () => {
+      shouldRenderRef.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [config, plot]);
+
+  const drawAnnotations = (u: uPlot) => {
+    if (!annotationsRef.current || !shouldRenderRef.current) {
+      return;
+    }
+
+    const ctx = u.ctx;
+    if (!ctx) {
+      return;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(u.bbox.left, u.bbox.top, u.bbox.width, u.bbox.height);
+    ctx.clip();
+
+    for (let i = 0; i < annotationsRef.current.length; i++) {
+      const entity = annotationsRef.current[i];
+      const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
+
+      if (entity.type === 'region') {
+        const yKey = config.scales[1].props.scaleKey;
+        renderRect(ctx, u, yKey, entity.timeStart, entity.timeEnd, lineColor, entity.fillOpacity);
+      }
+    }
+    ctx.restore();
+  };
 
   return null;
 };

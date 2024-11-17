@@ -5,7 +5,7 @@
   "id": "kensobi-spc-panel",
   "info": {
     "keywords": ["panel", "spc", "chart", "kensobi"],
-    "description": "Create common SPC charts like X-Bar chart or R-chart.",
+    "description": "Create common SPC charts like Xbar-R, XbarS, and XmR charts.",
     "author": {
       "name": "Kenso Software",
       "url": "https://kensobi.com"
@@ -17,15 +17,15 @@
     "links": [
       {
         "name": "Project site",
-        "url": "https://github.com/KensoBI/SPC-panel"
+        "url": "https://github.com/KensoBI/spc-chart"
       },
       {
         "name": "Documentation",
-        "url": "https://docs.kensobi.com/panels/spc"
+        "url": "https://docs.kensobi.com/panels/spc-chart/"
       },
       {
         "name": "License",
-        "url": "https://github.com/KensoBI/SPC-panel/blob/main/LICENSE"
+        "url": "https://github.com/KensoBI/spc-chart/blob/main/LICENSE"
       },
       {
         "name": "Author's site",
@@ -33,16 +33,14 @@
       }
     ],
     "screenshots": [
-      { "name": "X-Bar R chart", "path": "img/X-barR.gif" }, 
-      { "name": "R chart", "path": "img/R-bar.gif" }, 
-      { "name": "X-Bar S chart", "path": "img/X-barS.gif" },
-      { "name": "S chart", "path": "img/S-chart.gif" }
+      { "name": "SPC charts with variable", "path": "img/spc-chart-variable-v2.png" }, 
+      { "name": "SPC charts", "path": "img/spc-charts-v2.png" }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=9.5.7",
+    "grafanaDependency": ">=11.0.2",
     "plugins": []
   }
 }

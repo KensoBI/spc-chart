@@ -1,0 +1,1081 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 12,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in the chart. It can only be used as a reference table to pull control limits from field.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 2,
+            "name": "Nominal",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "max": 6,
+          "min": -7,
+          "noise": 0,
+          "refId": "B",
+          "scenarioId": "random_walk",
+          "seriesCount": 2
+        }
+      ],
+      "title": "Raw timeseries with limit lookup",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in the chart. LSL, USL and nominal are pulled from reference query. Mean is a computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 8,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "nominal",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 2,
+            "name": "Nominal",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 3,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -5,
+          "noise": 0,
+          "refId": "B",
+          "scenarioId": "random_walk"
+        }
+      ],
+      "title": "Raw chart with limit lookup and calculated field",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in the chart. LSL, USL and nominal are pulled from reference query. Mean, UCL and LCL are computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 6,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "max": 6,
+          "min": -4,
+          "refId": "B",
+          "scenarioId": "random_walk"
+        }
+      ],
+      "title": "X-Bar X chart with LSL, USL, Nominal lookup and calculated LCL UCL and mean",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two table data sources. Series A designated as Feature. It should not show up in the chart. LSL, USL and nominal are pulled from reference query. Mean, UCL and LCL are computed value from time series query (B).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 5,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "max": 6,
+          "min": -4,
+          "refId": "B",
+          "scenarioId": "random_walk"
+        }
+      ],
+      "title": "XmR (X) chart with LSL, USL, Nominal lookup and calculated LCL UCL and mean",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": []
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Cd"
+            },
+            "properties": []
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean B",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#8AB8FF",
+            "lineWidth": 2,
+            "name": "Mean C",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 2
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -4,
+          "refId": "B",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -4,
+          "refId": "C",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        }
+      ],
+      "title": "2 series and a reference table. Raw data. Calculated Mean. Nominal value from reference table. Static upper and lower limits",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "hue",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "dash": [
+                0,
+                10
+              ],
+              "fill": "dot"
+            },
+            "lineWidth": 1,
+            "pointSize": 2,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 7,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#C0D8FF",
+            "lineWidth": 2,
+            "name": "Mean B",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#5794F2",
+            "lineWidth": 2,
+            "name": "Mean C",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 2
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean D",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 3
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL B",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL B",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 1
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.0.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,5,-4,1.2",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -4,
+          "refId": "B",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -4,
+          "refId": "C",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 6,
+          "min": -4,
+          "refId": "D",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        }
+      ],
+      "title": "2 series and reference table with calculated LCL, UCL and Mean. Nominal value from reference table.",
+      "type": "kensobi-spc-panel"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Variable limits v2",
+  "uid": "fe3verf5opqtcb",
+  "version": 8,
+  "weekStart": ""
+}

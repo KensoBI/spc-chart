@@ -1,90 +1,42 @@
-import { PanelProps } from '@grafana/data';
-import { SpcParam } from 'data/spcParams';
-
-export type ConstantConfigItem = {
-  name: SpcParam | string;
-  color: string;
-  title: string;
-  lineWidth: number;
-};
+export const SUBGROUP_SIZE_VARIABLE = 'subgroupsize';
 
 export type LimitConfigItem = {
   name: string;
   color: string;
 };
 
-export type AggregationType = 'mean' | 'range' | 'standardDeviation';
-
-export type PresetChartType = 'xbarRChart' | 'RChart' | 'xbarSChart' | 'SChart' | 'xmr';
-
-export type ChartType = 'mrChart' | 'timeseries';
-
-export type DrawStyleType = 'bars' | 'lines' | 'points' | 'line';
-
-export type SpcOptions = {
-  sampleSize: number;
-  aggregation?: AggregationType;
-  chartType?: ChartType;
-  nominal?: number;
-  lsl?: number;
-  usl?: number;
-  constantsConfig?: ConstantsConfig;
-};
-
-export type LimitConfig = {
-  up?: LimitConfigItem;
-  down?: LimitConfigItem;
-};
-export type ConstantsConfig = {
-  items: ConstantConfigItem[];
-};
-
-export type TimeSeriesParams = {
-  displayName?: string;
-  min?: number;
-  max?: number;
-  decimals?: number;
-  fill?: number;
-  lineWidth?: number;
-  pointSize?: number;
-  lineColor?: string;
-  showLegend?: boolean;
-  drawStyle?: DrawStyleType;
-};
-
-export interface PanelOptions {
-  limitConfig?: LimitConfig;
-  timeseriesParams?: TimeSeriesParams;
-  spcOptions?: SpcOptions;
+export enum SpcChartTyp {
+  none = 'none',
+  x_XmR = 'X-XmR',
+  mR_XmR = 'mR-XmR',
+  x_XbarR = 'X-XbarR',
+  r_XbarR = 'R-XbarR',
+  x_XbarS = 'X-XbarS',
+  s_XbarS = 'S-XbarS',
 }
 
-export const defaultTimeseriesSettingsColor = 'rgb(31, 96, 196)';
-export const defaultTimeseriesParams: TimeSeriesParams = {
-  fill: 0,
-  lineWidth: 2,
-  pointSize: 6,
-  lineColor: defaultTimeseriesSettingsColor,
-  showLegend: true,
-  drawStyle: 'line',
-};
+export enum CurveFit {
+  none = 'none',
+  histogram = 'Histogram',
+  gaussian = 'Gaussian',
+}
 
-export const defaultSpcOptons: SpcOptions = {
-  sampleSize: 1,
-  aggregation: 'mean',
-  chartType: 'timeseries',
-  nominal: undefined,
-  lsl: undefined,
-  usl: undefined,
-  constantsConfig: undefined,
-};
-export const defaultConstantColor = '#37872d';
+export enum AggregationType {
+  none = 'none',
+  Mean = 'Mean',
+  Range = 'Range',
+  StandardDeviation = 'Standard deviation',
+  MovingRange = 'Moving range',
+}
 
-export const MAX_DEFAULT_SAMPLE_SIZE = 10;
+export enum PositionInput {
+  static = 'Static',
+  series = 'Series',
+}
 
-export const defaultPanelOptions: PanelOptions = {
-  limitConfig: undefined,
-  timeseriesParams: defaultTimeseriesParams,
-  spcOptions: defaultSpcOptons,
-};
-
-export interface ChartPanelProps extends PanelProps<PanelOptions> {}
+export interface ControlChartData {
+  centerLine: number;
+  upperControlLimit: number;
+  lowerControlLimit: number;
+  data: number[];
+}

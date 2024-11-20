@@ -49,7 +49,7 @@ Please see the full panel documentation at [KensoBI Docs](https://docs.kensobi.c
 
 If you have any questions or feedback, you can:
 
-- Create an [issue](https://github.com/KensoBI/spc-panel/issues) to report bugs, issues, and feature suggestions.
+- Create an [issue](https://github.com/KensoBI/spc-chart/issues) to report bugs, issues, and feature suggestions.
 - Ask a question on the [KensoBI Discord channel](https://discord.gg/cVKKh7trXU).
 
 Your feedback is always welcome!

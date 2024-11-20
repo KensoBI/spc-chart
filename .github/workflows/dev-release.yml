@@ -68,16 +68,3 @@ jobs:
       - name: Upload to Spaces
         run: |
           s3cmd put ${{ steps.metadata.outputs.archive }} --mime-type 'application/zip' --acl-public ${{ secrets.PLUGINS_PATH }}/dev/${{ steps.metadata.outputs.plugin-id }}.zip
-          
-      - name: Restart KensoBI server
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.DEV_DROPLET_HOST }}
-          username: ${{ secrets.DEV_DROPLET_USER }}
-          key: ${{ secrets.DEV_DROPLET_KEY}}
-          passphrase: ${{ secrets.DEV_DROPLET_PASSPHRASE }}
-          port: 22
-          script: |
-            docker compose -f /etc/kensobi/docker-compose.yml down 
-            docker compose -f /etc/kensobi/docker-compose.yml pull 
-            docker compose -f /etc/kensobi/docker-compose.yml up -d

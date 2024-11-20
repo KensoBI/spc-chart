@@ -20,10 +20,16 @@ The S-bar chart is used to monitor the variability within your process by assess
 
 <b>Aggregation Type:</b> Standard Deviation
 
+### Shewhart individuals control chart
+
+In statistical quality control, the individual/moving-range chart is a type of control chart used to monitor variables data from a business or industrial process for which it is impractical to use rational subgroups.
+
+<b>Chart types:</b> Time series (data without aggregation); Moving-range (Moving-range chart)
 
 ## Control Limits Calculation
 
 It's important to note that X-bar charts can have up to four control limits, depending on the type of chart and the desired analysis.
+
 
 ### X-bar charts
 The control limits for <b>X-bar charts</b> are calculated as follows:
@@ -51,6 +57,23 @@ For <b>S-bar charts</b>, the control limits are calculated as follows:
 UCL: B4 * S
 
 LCL: B3 * S
+
+### Shewhart individuals control chart
+
+For <b>Moving-range charts</b>, the control limits are calculated as follows:
+
+UCL: D4 * MR-bar 
+
+LCL: D3 * MR-bar
+
+_Where D4 and D3 is taken from the sample constants for n=2._
+
+For <b>Time series charts</b>, the control limits are calculated as follows:
+
+UCL: X-bar + 2,66 * MR-bar
+
+LCL: X-bar - 2,66 * MR-bar
+
 
 ### Constants
 The values A2, A3, D3, D4, B3, B4 are constants configured for calculations in the SPC panel. The values are also available as an [SQL script](https://gist.github.com/mrtomeq/e5d7a3d6321444ed89b263998c8e537b).

@@ -13,10 +13,12 @@ import {
 } from '@grafana/schema';
 
 export function computeControlLine(series: DataFrame[], options: Options): ControlLine[] {
-  const computedControlLines = addComputedControlLines(series, options);
-  const nonComputedControlLines = addNonComputedControlLines(series, options);
+  const controlLines = options.controlLines.map((cl) => ({ ...cl }));
 
-  return computedControlLines.concat(nonComputedControlLines).filter((p) => p.position);
+  const computedControlLines = processComputedControlLines(series, controlLines, options.featureQueryRefIds);
+  const allControlLines = processNonComputedControlLines(series, computedControlLines);
+
+  return allControlLines.filter((p) => p.position !== undefined);
 }
 
 export function buildControlLineFrame(series: DataFrame[], controlLines: ControlLine[]): DataFrame[] {
@@ -25,9 +27,6 @@ export function buildControlLineFrame(series: DataFrame[], controlLines: Control
   }
 
   const allIndexes = series.map((_, index) => index);
-
-  // Sort controlLines by position
-  controlLines.sort((a, b) => a.position! - b.position!);
 
   const timeFields = {
     name: 'time',
@@ -87,9 +86,9 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
   const limits: LimitAnnotation[] = [];
 
   // Sort controlLines by position
-  controlLines.sort((a, b) => a.position! - b.position!);
+  const sortedControlLines = [...controlLines].sort((a, b) => a.position! - b.position!);
 
-  controlLines.forEach((cl, index) => {
+  sortedControlLines.forEach((cl, index) => {
     if (!allIndexes.includes(cl.seriesIndex)) {
       return;
     }
@@ -103,10 +102,15 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
     };
     limits.push(flag);
 
-    const nextControlLine = controlLines[index + 1];
-
     if (cl.fillDirection === -1) {
-      const prevControlLine = controlLines[index - 1];
+      // Find the previous control line with a non-zero fillDirection
+      let prevControlLine;
+      for (let i = index - 1; i >= 0; i--) {
+        if (sortedControlLines[i].fillDirection !== 0) {
+          prevControlLine = sortedControlLines[i];
+          break;
+        }
+      }
       // Add region from the left
       const regionLeft: Region = {
         type: 'region',
@@ -119,6 +123,15 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
       };
       limits.push(regionLeft);
     } else if (cl.fillDirection === 1) {
+      // Find the next control line with a non-zero fillDirection
+      let nextControlLine;
+      for (let i = index + 1; i < sortedControlLines.length; i++) {
+        if (sortedControlLines[i].fillDirection !== 0) {
+          nextControlLine = sortedControlLines[i];
+          break;
+        }
+      }
+
       // Add region from the right
       const regionRight: Region = {
         type: 'region',
@@ -138,79 +151,66 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
   };
 }
 
-function addComputedControlLines(series: DataFrame[], options: Options): ControlLine[] {
-  if (!options.controlLines || options.controlLines.length === 0) {
-    return [];
+function processComputedControlLines(
+  series: DataFrame[],
+  controlLines: ControlLine[],
+  featureQueryRefIds: string[]
+): ControlLine[] {
+  if (!controlLines || controlLines.length === 0) {
+    return controlLines;
   }
 
-  // copy control lines to avoid mutating the original control line options.
-  const controlLines = options.controlLines.map((cl) => ({ ...cl }));
-
-  // grab id's of all computed reducers
+  // Extract IDs of all computed reducers
   const computedReducers = controlLineReducers.filter((p) => p.computed).map((p) => p.id);
 
-  // short circuite looping series if there are no computed control lines is provided options.
+  // Filter computed control lines
   const computedControlLines = controlLines.filter((cl) => computedReducers.includes(cl.reducerId));
+
+  // If no computed control lines, return the original array
   if (computedControlLines.length === 0) {
-    return [];
+    return controlLines;
   }
 
-  computedControlLines.forEach((cl) => {
-    let data = series.filter((frame) => {
-      return !options.featureQueryRefIds || !options.featureQueryRefIds.includes(frame.refId!);
-    });
-
-    if (cl.seriesIndex === undefined || cl.seriesIndex < 0 || cl.seriesIndex >= data.length) {
-      return;
+  // Map through control lines and compute positions
+  const updatedControlLines = controlLines.map((cl) => {
+    if (!computedReducers.includes(cl.reducerId)) {
+      return cl;
     }
 
-    const frame = data[cl.seriesIndex];
-    const numericFrames = frame.fields.filter((field) => field.type === FieldType.number && field.state?.calcs);
+    const applicableSeries = series.filter(
+      (frame) => !featureQueryRefIds || !featureQueryRefIds.includes(frame.refId!)
+    );
 
-    if (numericFrames.length > 0) {
-      // take first numeric frame
-      const calcs = numericFrames[0].state?.calcs;
-      if (!calcs) {
-        // no calcs cached, nothing to assign
-        return;
-      }
-
-      // if this control line was computed, grab computed value from calcs
-      if (computedReducers.includes(cl.reducerId)) {
-        cl.position = calcs[cl.reducerId];
-      }
+    if (cl.seriesIndex == null || cl.seriesIndex < 0 || cl.seriesIndex >= applicableSeries.length) {
+      return cl; // Skip if series index is invalid
     }
+
+    const frame = applicableSeries[cl.seriesIndex];
+    const numericField = frame.fields.find((field) => field.type === FieldType.number && field.state?.calcs);
+
+    if (!numericField || !numericField.state?.calcs) {
+      return cl; // Skip if no valid numeric field with cached calculations
+    }
+
+    // Assign the computed value to the position
+    const computedValue = numericField.state.calcs[cl.reducerId];
+    return {
+      ...cl,
+      position: computedValue ?? cl.position, // Keep existing position if computed value is undefined
+    };
   });
 
-  return computedControlLines;
+  return updatedControlLines;
 }
 
-function addNonComputedControlLines(series: DataFrame[], options: Options): ControlLine[] {
-  if (!options.controlLines || options.controlLines.length === 0) {
-    return [];
-  }
-
-  // copy control lines to avoid mutating the original control line options.
-  const controlLines = options.controlLines.map((cl) => ({ ...cl }));
-
-  // grab id's of all non-computed reducers
-  const nonComputedReducers = controlLineReducers.filter((p) => !p.computed).map((p) => p.id);
-
-  // filter non-computed control lines
-  const nonComputedControlLines = controlLines.filter((cl) => nonComputedReducers.includes(cl.reducerId));
-
-  if (nonComputedControlLines.length === 0) {
-    return [];
+function processNonComputedControlLines(series: DataFrame[], controlLines: ControlLine[]): ControlLine[] {
+  if (!controlLines || controlLines.length === 0) {
+    return controlLines;
   }
 
   series.map((frame, frameIndex) => {
-    const seriesControlLines = nonComputedControlLines.filter((c) => c.seriesIndex === frameIndex);
-    if (seriesControlLines.length === 0) {
-      return;
-    }
-
-    seriesControlLines.forEach((cl) => {
-      if (cl.positionInput === PositionInput.series) {
+    controlLines.forEach((cl) => {
+      if (cl.positionInput === PositionInput.series && cl.seriesIndex === frameIndex) {
         const field = frame.fields.find((f) => f.name === cl.field);
 
         if (field && field.values.length > 0) {
@@ -224,5 +224,5 @@ function addNonComputedControlLines(series: DataFrame[], options: Options): Cont
     });
   });
 
-  return nonComputedControlLines;
+  return controlLines;
 }

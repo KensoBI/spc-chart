@@ -40,15 +40,14 @@ export const SpcChartPanel = ({
 
   const { frames, limitAnnotations } = useMemo(() => {
     let samplesWithCalcs = doSpcCalcs(data.series, optionsWithVars);
-
     const controlLines = computeControlLine(samplesWithCalcs, optionsWithVars);
     const limitAnnotations = buildLimitAnnotations(samplesWithCalcs, controlLines);
-    const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines);
+    const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines, fieldConfig);
     const combined = samplesWithCalcs.concat(controlLineFrames);
     const preped = prepareGraphableFields(combined, config.theme2, timeRange);
 
     return { frames: preped, limitAnnotations };
-  }, [data.series, optionsWithVars, timeRange]);
+  }, [data.series, fieldConfig, optionsWithVars, timeRange]);
 
   const timezones = useMemo(() => getTimezones(options.timezone, timeZone), [options.timezone, timeZone]);
   const cursorSync = sync?.() ?? DashboardCursorSync.Off;

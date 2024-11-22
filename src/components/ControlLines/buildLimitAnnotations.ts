@@ -1,4 +1,4 @@
-import { DataFrame, FieldType } from '@grafana/data';
+import { DataFrame, FieldConfigSource, FieldType } from '@grafana/data';
 import { ControlLine, Options } from 'panelcfg';
 import { controlLineReducers } from 'data/spcReducers';
 import { Flag, LimitAnnotation, LimitAnnotationConfig, Region } from './LimitAnnotations';
@@ -21,7 +21,11 @@ export function computeControlLine(series: DataFrame[], options: Options): Contr
   return allControlLines.filter((p) => p.position !== undefined);
 }
 
-export function buildControlLineFrame(series: DataFrame[], controlLines: ControlLine[]): DataFrame[] {
+export function buildControlLineFrame(
+  series: DataFrame[],
+  controlLines: ControlLine[],
+  defaults: FieldConfigSource
+): DataFrame[] {
   if (!controlLines.length) {
     return [];
   }
@@ -66,6 +70,8 @@ export function buildControlLineFrame(series: DataFrame[], controlLines: Control
           gradientMode: GraphGradientMode.Opacity,
         },
         displayName: cl.name,
+        unit: defaults.defaults.unit,
+        decimals: defaults.defaults.decimals,
       },
     };
 

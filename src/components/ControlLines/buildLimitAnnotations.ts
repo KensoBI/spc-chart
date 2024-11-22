@@ -30,19 +30,38 @@ export function buildControlLineFrame(
     return [];
   }
 
-  const allIndexes = series.map((_, index) => index);
+  let timeField = null;
+
+  for (let dataframe of series) {
+    timeField = dataframe.fields.find(
+      (field) => field.type === FieldType.time && (!field.state || !field.state.hideFrom || !field.state.hideFrom.viz)
+    );
+
+    if (timeField) {
+      break;
+    }
+  }
+
+  let timeValues = [new Date().toISOString()]; // Default to current date
+
+  if (timeField) {
+    timeValues = [...timeField.values];
+  }
 
   const timeFields = {
     name: 'time',
     type: FieldType.time,
-    values: [new Date().toISOString()],
+    values: timeValues,
     config: {},
   };
+
   const constantDataFrame: DataFrame = {
     name: 'control limits',
     fields: [timeFields],
-    length: 1,
+    length: timeValues.length,
   };
+
+  const allIndexes = series.map((_, index) => index);
 
   controlLines.forEach((cl, index) => {
     if (!allIndexes.includes(cl.seriesIndex)) {
@@ -50,7 +69,7 @@ export function buildControlLineFrame(
     }
 
     const custom: GraphFieldConfig = {
-      transform: GraphTransform.Constant, // this will allow grafana to transform this field into a constant
+      transform: timeField === null ? GraphTransform.Constant : undefined, // this will allow grafana to transform this field into a constant
       lineWidth: cl.lineWidth,
       gradientMode: GraphGradientMode.None,
       lineInterpolation: LineInterpolation.Smooth,

@@ -1,5 +1,5 @@
 import { PanelPlugin } from '@grafana/data';
-import { commonOptionsBuilder } from '@grafana/ui';
+import { commonOptionsBuilder, TooltipDisplayMode } from '@grafana/ui';
 
 import { defaultGraphConfig, getGraphFieldConfig } from './config';
 import { FieldConfig, Options } from './panelcfg';
@@ -10,6 +10,7 @@ import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { migrateOptions } from 'migrations';
 import { TimezonesEditor } from 'components/options/TimezonesEditor';
 import { SpcChartPanel } from 'components/SpcChart';
+import { SortOrder } from '@grafana/schema';
 
 export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
   .setMigrationHandler(migrateOptions)
@@ -66,7 +67,13 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       category: ['SPC'],
     });
 
-    commonOptionsBuilder.addTooltipOptions(builder, false, false);
+    commonOptionsBuilder.addTooltipOptions(builder, false, false, {
+      tooltip: {
+        mode: TooltipDisplayMode.Multi,
+        sort: SortOrder.None,
+      },
+    });
+
     commonOptionsBuilder.addLegendOptions(builder);
     builder.addCustomEditor({
       id: 'timezone',

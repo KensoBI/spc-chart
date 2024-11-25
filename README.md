@@ -25,7 +25,7 @@ Please see the full panel documentation at [KensoBI Docs](https://docs.kensobi.c
 
 ## Development
 
-For information on how to set up a development environment and build the plugin see [DEVELOPMENT.md](DEVELOPMENT.md).
+For information on how to set up a development environment and build the plugin see [DEVELOPMENT.md](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/DEVELOPMENT.md).
 
 ## Getting Help
 

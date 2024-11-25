@@ -23,27 +23,9 @@ Please see the full panel documentation at [KensoBI Docs](https://docs.kensobi.c
 **NOTE:** The plugin comes with sample provisioned dashboards. Build and start the plugin to see them.
 
 
-## Building the plugin
-1. Install dependencies
+## Development
 
-   ```bash
-   yarn install
-   ```
-
-2. Build plugin in development mode and run in watch mode
-
-   ```bash
-   yarn run dev
-   ```
-3. Build plugin in production mode
-
-   ```bash
-   yarn run build
-   ```
-4. Start Grafana docker image
-   ```bash
-   docker compose up
-   ```
+For information on how to set up a development environment and build the plugin see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Getting Help
 

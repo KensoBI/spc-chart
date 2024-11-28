@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { StandardEditorProps, SelectableValue } from '@grafana/data';
 import { LineStyle } from '@grafana/schema';
-import { HorizontalGroup, IconButton, RadioButtonGroup, Select } from '@grafana/ui';
+import { Stack, IconButton, RadioButtonGroup, Select } from '@grafana/ui';
 
 type LineFill = 'solid' | 'dash' | 'dot';
 
@@ -71,7 +71,7 @@ export const LineStyleEditor = ({ value, onChange }: Props) => {
   }, [value, options]);
 
   return (
-    <HorizontalGroup>
+    <Stack>
       <RadioButtonGroup
         value={value?.fill || 'solid'}
         options={lineFillOptions}
@@ -117,7 +117,7 @@ export const LineStyleEditor = ({ value, onChange }: Props) => {
           </div>
         </>
       )}
-    </HorizontalGroup>
+    </Stack>
   );
 };
 

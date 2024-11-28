@@ -1,5 +1,5 @@
 import { StandardEditorProps, SelectableValue } from '@grafana/data';
-import { HorizontalGroup, RadioButtonGroup } from '@grafana/ui';
+import { Stack, RadioButtonGroup } from '@grafana/ui';
 
 import { InputPrefix, NullsThresholdInput } from './NullsThresholdInput';
 import React from 'react';
@@ -22,7 +22,7 @@ export const InsertNullsEditor = ({ value, onChange, item }: Props) => {
   DISCONNECT_OPTIONS[1].value = isThreshold ? value : 3600000; // 1h
 
   return (
-    <HorizontalGroup>
+    <Stack>
       <RadioButtonGroup value={value} options={DISCONNECT_OPTIONS} onChange={onChange} />
       {isThreshold && (
         <NullsThresholdInput
@@ -32,6 +32,6 @@ export const InsertNullsEditor = ({ value, onChange, item }: Props) => {
           isTime={item.settings?.isTime ?? false}
         />
       )}
-    </HorizontalGroup>
+    </Stack>
   );
 };

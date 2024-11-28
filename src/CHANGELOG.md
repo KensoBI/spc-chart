@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0
+## 2.0.2
 **New Features:**
 - **Complete panel rewrite** for improved performance and functionality.
 - **Added support for XmR chart** creation.
@@ -20,6 +20,10 @@
 
 - **License Update**: Changed from Apache 2.0 to **AGPL-3.0-only**.
   
+**Breaking Changes:**
+- Dashboards will automatically migrate settings from v1 to v2. However, thresholds **will need to be reapplied manually**. 
+- Support for Grafana 10 and earlier has been discontinued.
+
 **Compatibility:**
 
 - Now supports **Grafana 11**.

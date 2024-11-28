@@ -40,3 +40,11 @@ export interface ControlChartData {
   lowerControlLimit: number;
   data: number[];
 }
+
+export enum FieldCalcsTypes {
+  last = 'last',
+  first = 'first',
+  min = 'min',
+  max = 'max',
+  none = 'none',
+}

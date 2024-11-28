@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -26,61 +25,6 @@
       "datasource": {
         "type": "grafana",
         "uid": "grafana"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
       },
       "gridPos": {
         "h": 10,
@@ -90,60 +34,41 @@
       },
       "id": 1,
       "options": {
-        "aggregationType": "Mean",
-        "chartType": "X-XbarR",
-        "controlLines": [
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#37872d",
-            "lineWidth": 2,
-            "name": "Mean",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "mean",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "LCL R-bar",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "lcl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "UCL R-bar",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "ucl",
-            "seriesIndex": 0
-          }
-        ],
-        "featureQueryRefIds": [],
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "constantsConfig": {
+          "items": [
+            {
+              "color": "#37872d",
+              "lineWidth": 2,
+              "name": "mean",
+              "title": "Mean"
+            },
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "lcl_Rbar",
+              "title": "LCL R-bar"
+            },
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "ucl_Rbar",
+              "title": "UCL R-bar"
+            }
+          ]
         },
-        "subgroupSize": 5,
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "spcOptions": {
+          "aggregation": "mean",
+          "sampleSize": 5
+        },
+        "timeseriesParams": {
+          "decimals": 2,
+          "fill": 0,
+          "lineColor": "rgb(31, 96, 196)",
+          "lineWidth": 2,
+          "pointSize": 6,
+          "showLegend": true
         }
       },
-      "pluginVersion": "2.0.0",
       "targets": [
         {
           "datasource": {
@@ -162,61 +87,6 @@
         "type": "datasource",
         "uid": "grafana"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -225,60 +95,41 @@
       },
       "id": 2,
       "options": {
-        "aggregationType": "Range",
-        "chartType": "R-XbarR",
-        "controlLines": [
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "LCL",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "lcl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "UCL",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "ucl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#37872d",
-            "lineWidth": 2,
-            "name": "Mean",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "mean",
-            "seriesIndex": 0
-          }
-        ],
-        "featureQueryRefIds": [],
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "constantsConfig": {
+          "items": [
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "lcl",
+              "title": "LCL"
+            },
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "ucl",
+              "title": "UCL"
+            },
+            {
+              "color": "#37872d",
+              "lineWidth": 2,
+              "name": "mean",
+              "title": "Mean"
+            }
+          ]
         },
-        "subgroupSize": 5,
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "spcOptions": {
+          "aggregation": "range",
+          "sampleSize": 5
+        },
+        "timeseriesParams": {
+          "decimals": 2,
+          "fill": 0,
+          "lineColor": "rgb(31, 96, 196)",
+          "lineWidth": 2,
+          "pointSize": 6,
+          "showLegend": true
         }
       },
-      "pluginVersion": "2.0.0",
       "title": "R chart",
       "type": "kensobi-spc-panel"
     },
@@ -286,61 +137,6 @@
       "datasource": {
         "type": "datasource",
         "uid": "grafana"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
       },
       "gridPos": {
         "h": 9,
@@ -350,60 +146,51 @@
       },
       "id": 3,
       "options": {
-        "aggregationType": "Mean",
-        "chartType": "S-XbarS",
-        "controlLines": [
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "LCL S-bar",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "lcl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "UCL S-bar",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "ucl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#37872d",
-            "lineWidth": 2,
-            "name": "Mean",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "mean",
-            "seriesIndex": 0
-          }
-        ],
-        "featureQueryRefIds": [],
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "constantsConfig": {
+          "items": [
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "lcl_Sbar",
+              "title": "LCL S-bar"
+            },
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "ucl_Sbar",
+              "title": "UCL S-bar"
+            },
+            {
+              "color": "#37872d",
+              "lineWidth": 2,
+              "name": "mean",
+              "title": "Mean"
+            }
+          ]
         },
-        "subgroupSize": 10,
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "limitConfig": {
+          "down": {
+            "color": "#FA6400",
+            "name": "lcl_Sbar"
+          },
+          "up": {
+            "color": "#FA6400",
+            "name": "ucl_Sbar"
+          }
+        },
+        "spcOptions": {
+          "aggregation": "mean",
+          "sampleSize": 10
+        },
+        "timeseriesParams": {
+          "decimals": 2,
+          "fill": 0,
+          "lineColor": "rgb(31, 96, 196)",
+          "lineWidth": 2,
+          "pointSize": 6,
+          "showLegend": true
         }
       },
-      "pluginVersion": "2.0.0",
       "title": "X-bar S Chart",
       "type": "kensobi-spc-panel"
     },
@@ -411,61 +198,6 @@
       "datasource": {
         "type": "datasource",
         "uid": "grafana"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
       },
       "gridPos": {
         "h": 9,
@@ -475,66 +207,48 @@
       },
       "id": 4,
       "options": {
-        "aggregationType": "Standard deviation",
-        "chartType": "S-XbarS",
-        "controlLines": [
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "LCL",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "lcl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#C4162A",
-            "lineWidth": 2,
-            "name": "UCL",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "ucl",
-            "seriesIndex": 0
-          },
-          {
-            "field": "",
-            "fillDirection": 0,
-            "fillOpacity": 10,
-            "lineColor": "#37872d",
-            "lineWidth": 2,
-            "name": "Mean",
-            "position": 0,
-            "positionInput": "Static",
-            "reducerId": "mean",
-            "seriesIndex": 0
-          }
-        ],
-        "featureQueryRefIds": [],
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "constantsConfig": {
+          "items": [
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "lcl",
+              "title": "LCL"
+            },
+            {
+              "color": "#C4162A",
+              "lineWidth": 2,
+              "name": "ucl",
+              "title": "UCL"
+            },
+            {
+              "color": "#37872d",
+              "lineWidth": 2,
+              "name": "mean",
+              "title": "Mean"
+            }
+          ]
         },
-        "subgroupSize": 10,
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "spcOptions": {
+          "aggregation": "standardDeviation",
+          "sampleSize": 10
+        },
+        "timeseriesParams": {
+          "decimals": 2,
+          "fill": 0,
+          "lineColor": "rgb(31, 96, 196)",
+          "lineWidth": 2,
+          "pointSize": 6,
+          "showLegend": true
         }
       },
-      "pluginVersion": "2.0.0",
       "title": "S Chart",
       "type": "kensobi-spc-panel"
     }
   ],
   "refresh": "",
-  "schemaVersion": 39,
+  "schemaVersion": 38,
+  "style": "dark",
   "tags": [],
   "templating": {
     "list": []
@@ -545,8 +259,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "SPC Chart v1 - migration",
+  "title": "SPC Panel charts",
   "uid": "af1cd81f-12e9-4c9a-9c13-9faa4c33479c",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }

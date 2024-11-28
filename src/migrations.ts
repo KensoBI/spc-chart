@@ -17,28 +17,23 @@ interface OldSPCOptions {
   usl: number | undefined;
 }
 
-// interface OldPanelOptions {
-//   spcOptions: OldSPCOptions;
-//   constantsConfig: {
-//     items: OldConstantConfig[];
-//   };
-//   tooltip: VizTooltipOptions;
-//   legend: VizLegendOptions;
-// }
-
 export const migrateOptions = (oldOptions: any): any => {
-  // Create new panel options
-  const newOptions: Options = {
-    chartType: mapChartType(oldOptions.options.constantsConfig?.items, oldOptions.options.spcOptions?.aggregation),
-    subgroupSize: oldOptions.options.spcOptions?.sampleSize || 1,
-    aggregationType: mapAggregationType(oldOptions.options.spcOptions?.aggregation),
-    controlLines: migrateControlLines(oldOptions.options.constantsConfig?.items || [], oldOptions.options.spcOptions),
-    legend: oldOptions.options.legend,
-    tooltip: oldOptions.options.tooltip,
-    featureQueryRefIds: [],
-    onSeriesColorChange: function (label: string, color: string): void {},
-  };
-  return newOptions;
+  if (oldOptions.options.constantsConfig || oldOptions.options.spcOptions) {
+    // Create new panel options
+    const newOptions: Options = {
+      chartType: mapChartType(oldOptions.options.constantsConfig?.items, oldOptions.options.spcOptions?.aggregation),
+      subgroupSize: oldOptions.options.spcOptions?.sampleSize || 1,
+      aggregationType: mapAggregationType(oldOptions.options.spcOptions?.aggregation),
+      controlLines: migrateControlLines(oldOptions.options.constantsConfig?.items || [], oldOptions.options.spcOptions),
+      legend: oldOptions.options.legend,
+      tooltip: oldOptions.options.tooltip,
+      featureQueryRefIds: [],
+      onSeriesColorChange: function (label: string, color: string): void {},
+    };
+    return newOptions;
+  }
+
+  return oldOptions.options;
 };
 
 function mapAggregationType(oldAggregation: string): AggregationType {

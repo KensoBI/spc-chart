@@ -1,21 +1,21 @@
 import React, { useCallback } from 'react';
-import { StandardEditorProps, SelectableValue } from '@grafana/data';
+import { StandardEditorProps } from '@grafana/data';
 import { GraphThresholdsStyleMode } from '@grafana/schema';
-import { Select } from '@grafana/ui';
+import { Combobox, type ComboboxOption } from '@grafana/ui';
 
 type Props = StandardEditorProps<
-  SelectableValue<{ mode: GraphThresholdsStyleMode }>,
-  { options: Array<SelectableValue<GraphThresholdsStyleMode>> }
+  { mode: GraphThresholdsStyleMode },
+  { options: Array<ComboboxOption<GraphThresholdsStyleMode>> }
 >;
 
 export const ThresholdsStyleEditor = ({ item, value, onChange, id }: Props) => {
   const onChangeCb = useCallback(
-    (v: SelectableValue<GraphThresholdsStyleMode>) => {
+    (option: ComboboxOption<GraphThresholdsStyleMode>) => {
       onChange({
-        mode: v.value,
+        mode: option.value,
       });
     },
     [onChange]
   );
-  return <Select inputId={id} value={value.mode} options={item.settings?.options ?? []} onChange={onChangeCb} />;
+  return <Combobox id={id} value={value.mode} options={item.settings?.options ?? []} onChange={onChangeCb} />;
 };

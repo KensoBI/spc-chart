@@ -13,7 +13,7 @@ describe('prepare timeseries graph', () => {
       }),
     ];
     const frames = prepareGraphableFields(input, createTheme());
-    expect(frames).toBeNull();
+    expect(frames).toEqual([]);
   });
 
   it('requires a number or boolean value', () => {
@@ -26,7 +26,7 @@ describe('prepare timeseries graph', () => {
       }),
     ];
     const frames = prepareGraphableFields(input, createTheme());
-    expect(frames).toBeNull();
+    expect(frames).toEqual([]);
   });
 
   it('sets classic palette index on graphable fields', () => {

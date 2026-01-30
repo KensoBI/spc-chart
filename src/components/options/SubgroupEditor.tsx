@@ -1,11 +1,11 @@
 import React from 'react';
-import { Input, Select } from '@grafana/ui';
+import { Input, Combobox, type ComboboxOption } from '@grafana/ui';
 import { StandardEditorProps } from '@grafana/data';
 import { SpcChartTyp } from 'types';
 import { useSubgroupSize } from './useSubgroupSize';
 import { Options } from 'panelcfg';
 
-function createSubgroupOptions(startIndex: number, endIndex: number): Array<{ label: string; value: number }> {
+function createSubgroupOptions(startIndex: number, endIndex: number): Array<ComboboxOption<number>> {
   return Array.from({ length: endIndex - startIndex + 1 }, (_, i) => ({
     label: `${i + startIndex}`,
     value: i + startIndex,
@@ -30,9 +30,9 @@ export const SubgroupEditor = ({ item, value, onChange, context }: StandardEdito
       {isDisabled ? (
         <Input value={subgroupSize} disabled={true} />
       ) : (
-        <Select
+        <Combobox
           isClearable={false}
-          allowCustomValue={chartType === SpcChartTyp.none} // Allow custom value only for 'none' chart type
+          createCustomValue={chartType === SpcChartTyp.none} // Allow custom value only for 'none' chart type
           value={subgroupSize}
           options={subgroupOptions}
           onChange={(selected) => onChange(selected.value)}

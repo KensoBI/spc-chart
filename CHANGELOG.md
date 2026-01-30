@@ -1,6 +1,24 @@
 # Changelog
 
-## 2.0.0
+## 2.1.1
+
+**New Features:**
+- **Alerting Support**: Support for Grafana alerting with alert states and annotations displayed on the chart.
+  - Alert states are now visualized directly on the chart
+  - Alert annotations show historical alert events on the timeline
+  - Create alerts based on SPC control limits (UCL, LCL) to detect out-of-control processes
+- **Annotation Support**: Support for Grafana annotations with ability to create custom annotations directly on the chart.
+
+**Enhancements:**
+
+- **Dependency Upgrades**: Updated all dependencies to latest versions for improved security and performance.
+
+**Compatibility:**
+
+- Now supports **React 19**.
+- Now supports **Grafana 13**.
+
+## 2.0.2
 **New Features:**
 - **Complete panel rewrite** for improved performance and functionality.
 - **Added support for XmR chart** creation.

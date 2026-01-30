@@ -15,6 +15,28 @@ Welcome to the **KensoBI SPC Chart** panel for **Grafana**. This plugin enables 
 - **Subgrouping:** Group your samples into subgroups for analysis.
 
 - **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
+- **Alerting Support:** Support for Grafana alerting with alert states and annotations displayed on the chart.
+
+- **Threshold Visualization:** Configure and visualize alert thresholds alongside SPC control limits.
+
+## Alerting and Custom Annotations
+
+The SPC Chart panel supports Grafana alerting with annotations:
+
+- **Alert States:** The panel displays alert states directly on the chart, making it easy to see when alerts are firing.
+
+- **Alert Annotations:** Historical alert events are shown as annotations on the chart timeline, providing visual context for when process control issues occurred.
+
+- **Threshold Configuration:** Configure alert thresholds in the panel's field configuration to define when alerts should trigger. These thresholds are displayed alongside your SPC control limits.
+
+- **SPC-Based Alerts:** Create alert rules based on SPC control limits (UCL, LCL) to automatically detect when your process goes out of statistical control. For example:
+  - Alert when values exceed the Upper Control Limit (UCL)
+  - Alert when values fall below the Lower Control Limit (LCL)
+  - Alert on trends or patterns that indicate special cause variation
+
+- Create custom annotations directly on the chart.
+
+To create an alert based on SPC limits, configure an alert rule in Grafana that uses the same query as your SPC chart, and set threshold conditions based on your calculated control limits.
 
 ## Documentation
 

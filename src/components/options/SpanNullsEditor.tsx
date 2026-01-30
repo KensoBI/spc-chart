@@ -3,30 +3,29 @@ import { StandardEditorProps, SelectableValue } from '@grafana/data';
 import { Stack, RadioButtonGroup } from '@grafana/ui';
 import { InputPrefix, NullsThresholdInput } from './NullsThresholdInput';
 
-const GAPS_OPTIONS: Array<SelectableValue<boolean | number>> = [
-  {
-    label: 'Never',
-    value: false,
-  },
-  {
-    label: 'Always',
-    value: true,
-  },
-  {
-    label: 'Threshold',
-    value: 3600000, // 1h
-  },
-];
-
 type Props = StandardEditorProps<boolean | number, { isTime: boolean }>;
 
 export const SpanNullsEditor = ({ value, onChange, item }: Props) => {
   const isThreshold = typeof value === 'number';
-  GAPS_OPTIONS[2].value = isThreshold ? value : 3600000; // 1h
+
+  const gapsOptions: Array<SelectableValue<boolean | number>> = React.useMemo(() => [
+    {
+      label: 'Never',
+      value: false,
+    },
+    {
+      label: 'Always',
+      value: true,
+    },
+    {
+      label: 'Threshold',
+      value: isThreshold ? value : 3600000, // 1h
+    },
+  ], [isThreshold, value]);
 
   return (
     <Stack>
-      <RadioButtonGroup value={value} options={GAPS_OPTIONS} onChange={onChange} />
+      <RadioButtonGroup value={value} options={gapsOptions} onChange={onChange} />
       {isThreshold && (
         <NullsThresholdInput
           value={value}

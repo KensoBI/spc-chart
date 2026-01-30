@@ -83,6 +83,5 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       editor: TimezonesEditor,
       defaultValue: undefined,
     });
-  });
-//.setSuggestionsSupplier(new TimeSeriesSuggestionsSupplier())
-//.setDataSupport({ annotations: true, alertStates: true });
+  })
+  .setDataSupport({ annotations: true, alertStates: true });

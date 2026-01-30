@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { StandardEditorProps, SelectableValue } from '@grafana/data';
+import { StandardEditorProps } from '@grafana/data';
 import { LineStyle } from '@grafana/schema';
-import { Stack, IconButton, RadioButtonGroup, Select } from '@grafana/ui';
+import { Stack, IconButton, RadioButtonGroup, Combobox, type ComboboxOption } from '@grafana/ui';
 
 type LineFill = 'solid' | 'dash' | 'dot';
 
-const lineFillOptions: Array<SelectableValue<LineFill>> = [
+const lineFillOptions: Array<ComboboxOption<LineFill>> = [
   {
     label: 'Solid',
     value: 'solid',
@@ -20,7 +20,7 @@ const lineFillOptions: Array<SelectableValue<LineFill>> = [
   },
 ];
 
-const dashOptions: Array<SelectableValue<string>> = [
+const dashOptions: Array<ComboboxOption<string>> = [
   '10, 10', // default
   '10, 15',
   '10, 20',
@@ -40,7 +40,7 @@ const dashOptions: Array<SelectableValue<string>> = [
   value: txt,
 }));
 
-const dotOptions: Array<SelectableValue<string>> = [
+const dotOptions: Array<ComboboxOption<string>> = [
   '0, 10', // default
   '0, 20',
   '0, 30',
@@ -55,19 +55,12 @@ type Props = StandardEditorProps<LineStyle, unknown>;
 
 export const LineStyleEditor = ({ value, onChange }: Props) => {
   const options = useMemo(() => (value?.fill === 'dash' ? dashOptions : dotOptions), [value]);
-  const current = useMemo(() => {
+  const current = useMemo<string>(() => {
     if (!value?.dash?.length) {
-      return options[0];
+      return options[0].value;
     }
     const str = value.dash?.join(', ');
-    const val = options.find((o) => o.value === str);
-    if (!val) {
-      return {
-        label: str,
-        value: str,
-      };
-    }
-    return val;
+    return str;
   }, [value, options]);
 
   return (
@@ -91,18 +84,17 @@ export const LineStyleEditor = ({ value, onChange }: Props) => {
       />
       {value?.fill && value?.fill !== 'solid' && (
         <>
-          <Select
-            allowCustomValue={true}
+          <Combobox
+            createCustomValue={true}
             options={options}
             value={current}
             width={20}
-            onChange={(v) => {
+            onChange={(option) => {
               onChange({
                 ...value,
-                dash: parseText(v.value ?? ''),
+                dash: parseText(option.value),
               });
             }}
-            formatCreateLabel={(t) => `Segments: ${parseText(t).join(', ')}`}
           />
           <div>
             &nbsp;

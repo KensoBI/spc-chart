@@ -11,12 +11,13 @@ import {
 import {
   Button,
   ColorPicker,
+  Combobox,
+  type ComboboxOption,
   Field,
   Icon,
   IconButton,
   Input,
   RadioButtonGroup,
-  Select,
   Slider,
   Stack,
   ValuePicker,
@@ -303,26 +304,16 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                   />
                 </Field>
                 <Field label="Series" description="Select the series for which to calculate this control.">
-                  <Select
+                  <Combobox
                     placeholder="Select series"
                     isClearable={true}
                     value={controlLine.seriesIndex}
-                    options={getFilteredDataFramesForReducer(controlLine.reducerId).map((frame, index) => ({
-                      value: index,
-                      label: `${frame.refId} > ${getFrameDisplayName(frame, index)}`,
-                    }))}
-                    formatOptionLabel={(option) => {
-                      const label = option.label || '';
-                      const parts = label.split(' > ');
-
-                      return (
-                        <div>
-                          {parts[0]} {/* frame.refId */}
-                          <Icon name="angle-right" className={styles.chevron} />
-                          {parts[1] || ''} {/* getFrameDisplayName */}
-                        </div>
-                      );
-                    }}
+                    options={getFilteredDataFramesForReducer(controlLine.reducerId).map<ComboboxOption<number>>(
+                      (frame, index) => ({
+                        value: index,
+                        label: `${frame.refId} › ${getFrameDisplayName(frame, index)}`,
+                      })
+                    )}
                     onChange={(value) => {
                       if (!value) {
                         return;
@@ -361,16 +352,18 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     )}
                     {controlLine.positionInput === PositionInput.series && (
                       <Field label="Field" description="Select field for control line position.">
-                        <Select
+                        <Combobox
                           placeholder="Field"
                           isClearable={true}
                           value={controlLine.field}
-                          options={getFilteredDataFramesForReducer(controlLine.reducerId)
-                            .find((_f, i) => i === controlLine.seriesIndex)
-                            ?.fields.map((field, index) => ({
-                              value: field.name,
-                              label: field.display?.name ?? `${getFieldDisplayName(field)}`,
-                            }))}
+                          options={
+                            getFilteredDataFramesForReducer(controlLine.reducerId)
+                              .find((_f, i) => i === controlLine.seriesIndex)
+                              ?.fields.map<ComboboxOption<string>>((field, index) => ({
+                                value: field.name,
+                                label: field.display?.name ?? `${getFieldDisplayName(field)}`,
+                              })) ?? []
+                          }
                           onChange={(value) => {
                             if (!value) {
                               return;

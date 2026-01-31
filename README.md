@@ -15,9 +15,12 @@ Welcome to the **KensoBI SPC Chart** panel for **Grafana**. This plugin enables 
 - **Subgrouping:** Group your samples into subgroups for analysis.
 
 - **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
+
 - **Alerting Support:** Support for Grafana alerting with alert states and annotations displayed on the chart.
 
 - **Threshold Visualization:** Configure and visualize alert thresholds alongside SPC control limits.
+
+- **Numeric X-axis Support:** Monitor indexed/sequential data (CSV imports, sample numbers, etc.) using numeric X-axis instead of time-based data. Similar to Grafana's Trend panel, enabling SPC analysis for non-time-series datasets.
 
 ## Alerting and Custom Annotations
 

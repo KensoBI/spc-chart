@@ -19,6 +19,9 @@ Welcome to the **KensoBI SPC Chart** panel for **Grafana**. This plugin enables 
 
 - **Threshold Visualization:** Configure and visualize alert thresholds alongside SPC control limits.
 
+- **Numeric X-axis Support:** Monitor indexed/sequential data (CSV imports, sample numbers, etc.) using numeric X-axis instead of time-based data. Similar to Grafana's Trend panel, enabling SPC analysis for non-time-series datasets.
+
+
 ## Alerting and Custom Annotations
 
 The SPC Chart panel supports Grafana alerting with annotations:

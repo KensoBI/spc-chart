@@ -80,7 +80,6 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       id: 'xField',
       name: 'X-axis field',
       path: 'xField',
-      description: 'Select a numeric field for X-axis. Leave empty to use time.',
       category: ['Axis'],
       editor: XFieldEditor,
       defaultValue: undefined,

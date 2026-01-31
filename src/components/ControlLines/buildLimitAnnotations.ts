@@ -226,7 +226,16 @@ function processComputedControlLines(
     }
 
     const frame = applicableSeries[cl.seriesIndex];
-    const numericField = frame.fields.find((field) => field.type === FieldType.number && field.state?.calcs);
+
+    // Find the target field - use specified field name if provided, otherwise find first numeric field
+    let numericField;
+    if (cl.field) {
+      numericField = frame.fields.find(
+        (field) => field.name === cl.field && field.type === FieldType.number && field.state?.calcs
+      );
+    } else {
+      numericField = frame.fields.find((field) => field.type === FieldType.number && field.state?.calcs);
+    }
 
     if (!numericField || !numericField.state?.calcs) {
       return cl; // Skip if no valid numeric field with cached calculations

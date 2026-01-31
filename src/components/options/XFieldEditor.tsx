@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Combobox, type ComboboxOption } from '@grafana/ui';
+import { Combobox, type ComboboxOption, Icon, Tooltip } from '@grafana/ui';
 import { FieldType, StandardEditorProps } from '@grafana/data';
 import { Options } from 'panelcfg';
 
@@ -23,13 +23,30 @@ export const XFieldEditor = ({ value, onChange, context }: StandardEditorProps<s
   }, [context.data]);
 
   return (
-    <Combobox
-      options={options}
-      value={value || ''}
-      onChange={(selected) => {
-        onChange(selected?.value || undefined);
-      }}
-      placeholder="Select X-axis field"
-    />
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <Combobox
+        options={options}
+        value={value || ''}
+        onChange={(selected) => {
+          onChange(selected?.value || undefined);
+        }}
+        placeholder="Select X-axis field"
+      />
+      <Tooltip
+        content={
+          <div>
+            Choose X-axis type:
+            <br />
+            <br />
+            <strong>Time (default):</strong> Use for time series data
+            <br />
+            <strong>Numeric field:</strong> Must be increasing numeric values (e.g., 1, 2, 3...). Use for
+            indexed/sequential data like CSV imports.
+          </div>
+        }
+      >
+        <Icon name="info-circle" size="sm" />
+      </Tooltip>
+    </div>
   );
 };

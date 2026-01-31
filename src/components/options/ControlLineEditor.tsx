@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import {
   DataFrame,
+  FieldType,
   GrafanaTheme2,
   SelectableValue,
   StandardEditorProps,
@@ -108,10 +109,22 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     }));
 
   function createControlLine(reducer: ControlLineReducer, seriesIndex: number): ControlLine {
+    // For computed control lines, try to set a default field
+    let defaultField = '';
+    if (reducer.computed) {
+      const frames = getFilteredDataFramesForReducer(reducer.id);
+      if (frames[seriesIndex]) {
+        const numericField = frames[seriesIndex].fields.find((field) => field.type === FieldType.number);
+        if (numericField) {
+          defaultField = numericField.name;
+        }
+      }
+    }
+
     return {
       reducerId: reducer.id,
       name: reducer.name,
-      field: '',
+      field: defaultField,
       positionInput: PositionInput.static,
       seriesIndex: seriesIndex,
       lineWidth: 2,
@@ -323,6 +336,41 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     }}
                   />
                 </Field>
+                {isComputed(controlLine.reducerId) && (() => {
+                  const frame = getFilteredDataFramesForReducer(controlLine.reducerId).find(
+                    (_f, i) => i === controlLine.seriesIndex
+                  );
+                  const numericFields = frame?.fields.filter((field) => field.type === FieldType.number) ?? [];
+
+                  // Only show field selector if there are multiple numeric fields
+                  if (numericFields.length <= 1) {
+                    return null;
+                  }
+
+                  return (
+                    <Field
+                      label="Field"
+                      description="Select which field to calculate this control line for. Required when multiple numeric fields exist."
+                    >
+                      <Combobox
+                        placeholder="Field"
+                        isClearable={false}
+                        value={controlLine.field}
+                        options={numericFields.map<ComboboxOption<string>>((field) => ({
+                          value: field.name,
+                          label: field.display?.name ?? `${getFieldDisplayName(field)}`,
+                        }))}
+                        onChange={(value) => {
+                          if (!value) {
+                            return;
+                          }
+
+                          handleControlLineChange(index, 'field', value.value);
+                        }}
+                      />
+                    </Field>
+                  );
+                })()}
                 {!isComputed(controlLine.reducerId) && (
                   <>
                     <Field label="Position input">

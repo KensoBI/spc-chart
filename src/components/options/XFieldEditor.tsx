@@ -41,7 +41,7 @@ export const XFieldEditor = ({ value, onChange, context }: StandardEditorProps<s
             <strong>Time (default):</strong> Use for time series data
             <br />
             <strong>Numeric field:</strong> Must be increasing numeric values (e.g., 1, 2, 3...). Use for
-            indexed/sequential data like CSV imports.
+            indexed/sequential data.
           </div>
         }
       >

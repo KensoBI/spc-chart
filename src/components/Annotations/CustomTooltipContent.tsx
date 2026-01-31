@@ -9,7 +9,7 @@ interface CustomTooltipContentProps {
   focusedPointIdx: number | null;
   frames: DataFrame[];
   timeZone: string;
-  onAddAnnotation: (time: number) => void;
+  onAddAnnotation?: (time: number) => void;
   isPinned?: boolean;
   onDismiss?: () => void;
 }
@@ -119,8 +119,8 @@ export const CustomTooltipContent: React.FC<CustomTooltipContentProps> = ({
           </div>
         ))}
 
-        {/* Add annotation button - only show when tooltip is pinned */}
-        {isPinned && (
+        {/* Add annotation button - only show when tooltip is pinned and annotation creation is available */}
+        {isPinned && onAddAnnotation && (
           <div className={styles.buttonContainer}>
             <Button
               variant="secondary"

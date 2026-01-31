@@ -152,17 +152,15 @@ export const SpcChartPanel = ({
               {limitAnnotations.limits && (
                 <LimitAnnotations annotations={limitAnnotations.limits} config={uplotConfig} />
               )}
-              {((annotations && annotations.length > 0) || newAnnotation) && (
-                <AlertAnnotations
-                  annotations={annotations}
-                  config={uplotConfig}
-                  timeZone={timeZone}
-                  panelId={id}
-                  dashboardUID={dashboardUID}
-                  onAnnotationChange={handleAnnotationSuccess}
-                  newAnnotation={newAnnotation}
-                />
-              )}
+              <AlertAnnotations
+                annotations={annotations}
+                config={uplotConfig}
+                timeZone={timeZone}
+                panelId={id}
+                dashboardUID={dashboardUID}
+                onAnnotationChange={handleAnnotationSuccess}
+                newAnnotation={newAnnotation}
+              />
               <KeyboardPlugin config={uplotConfig} />
               {cursorSync !== DashboardCursorSync.Off && (
                 <EventBusPlugin config={uplotConfig} eventBus={eventBus} frame={alignedFrame} />

@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { PanelProps, DashboardCursorSync, FieldMatcherID, fieldMatchers } from '@grafana/data';
+import { PanelProps, DashboardCursorSync, FieldMatcherID, fieldMatchers, DataFrame } from '@grafana/data';
 import { config, PanelDataErrorView, locationService } from '@grafana/runtime';
 import {
   EventBusPlugin,
@@ -22,7 +22,7 @@ import { AlertAnnotations } from 'components/ControlLines/AlertAnnotations';
 import { CustomTooltipContent, AnnotationFormModal } from 'components/Annotations';
 import { getTimezones, prepareGraphableFields } from 'utils';
 import { Options } from 'panelcfg';
-import { preparePlotFrame } from 'utils/preparePlotFrame';
+import { preparePlotFrame, XYFieldMatchers } from 'utils/preparePlotFrame';
 
 interface SpcChartPanelProps extends PanelProps<Options> {}
 
@@ -113,22 +113,18 @@ export const SpcChartPanel = ({
   // Callback to prepare frames for plotting with numeric X-axis
   // This mirrors Grafana's Trend panel implementation
   const preparePlotFrameCallback = useCallback(
-    (frames: any[], dimFields: any, timeRange?: any) => {
-      // Only modify behavior if we're using numeric X-axis
-      if (!useNumericX || !optionsWithVars.xField) {
-        return undefined; // Let TimeSeries use default behavior
-      }
-
+    (frames: DataFrame[], dimFields: XYFieldMatchers): DataFrame | null => {
       // Override the X field matcher to use our numeric field
       const modifiedDimFields = {
         ...dimFields,
-        x: fieldMatchers.get(FieldMatcherID.byName).get(optionsWithVars.xField),
+        x: fieldMatchers.get(FieldMatcherID.byName).get(optionsWithVars.xField!),
       };
 
       // Call our preparePlotFrame function with modified dimFields
-      return preparePlotFrame(frames, modifiedDimFields);
+      const result = preparePlotFrame(frames, modifiedDimFields);
+      return result ?? null;
     },
-    [useNumericX, optionsWithVars.xField]
+    [optionsWithVars.xField]
   );
 
   // Annotation handlers
@@ -206,7 +202,7 @@ export const SpcChartPanel = ({
         height={height}
         legend={options.legend}
         options={options}
-        preparePlotFrame={preparePlotFrameCallback as any}
+        {...(useNumericX && { preparePlotFrame: preparePlotFrameCallback })}
       >
         {(uplotConfig, alignedFrame) => {
           return (

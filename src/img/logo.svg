@@ -1,1 +1,18 @@
-<svg width="548" height="493" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="hidden"><defs><clipPath id="clip0"><rect x="333" y="81" width="548" height="493"/></clipPath></defs><g clip-path="url(#clip0)" transform="translate(-333 -81)"><path d="M0 0 467.538 5.35139" stroke="#70AD47" stroke-width="12.6667" stroke-linecap="round" stroke-miterlimit="8" fill="none" fill-rule="evenodd" transform="matrix(1 0 0 -1 406.5 304.851)"/><path d="M853.66 573.789 402.557 573.789C367.641 576.62 337.04 550.629 334.208 515.736 333.931 512.325 333.931 508.896 334.208 505.485L334.208 109.322C334.208 94.2323 346.448 82 361.547 82 376.647 82 388.887 94.2323 388.887 109.322L388.887 505.485C388.887 517.752 390.281 519.146 402.557 519.146L853.66 519.146C868.76 519.146 881 531.378 881 546.468 881 561.557 868.76 573.789 853.66 573.789Z" fill="#396CE8" fill-rule="evenodd" fill-opacity="0.4"/><path d="M826.396 204.058 826.122 204.058C803.476 204.058 785.118 222.438 785.118 245.11 785.166 248.552 785.653 251.973 786.567 255.291L726.974 314.926C723.692 314.041 720.312 313.572 716.914 313.53L716.64 313.53C713.023 313.577 709.428 314.111 705.952 315.117L647.07 256.057C653.397 234.587 641.142 212.047 619.697 205.712 615.805 204.562 611.763 204.005 607.705 204.058L607.432 204.058C584.839 204.134 566.564 222.491 566.564 245.11 566.613 248.552 567.1 251.973 568.013 255.291L508.42 314.926C505.138 314.041 501.759 313.572 498.36 313.53L498.087 313.53C475.064 313.309 456.222 331.815 456.002 354.864 455.782 377.913 474.266 396.777 497.289 396.998 520.311 397.219 539.153 378.713 539.374 355.664 539.413 351.595 538.857 347.542 537.725 343.634L596.798 284.492C600.352 285.532 604.031 286.084 607.733 286.135 611.131 286.092 614.511 285.624 617.793 284.739L677.358 344.346C676.454 347.675 675.976 351.105 675.937 354.554 675.9 377.227 694.228 395.636 716.874 395.673 739.52 395.71 757.908 377.361 757.946 354.689 757.952 350.943 757.446 347.215 756.442 343.607L815.516 284.465C837.258 290.807 860.018 278.302 866.353 256.534 872.687 234.767 860.196 211.98 838.454 205.639 834.556 204.501 830.51 203.95 826.45 204.003Z" fill="#396CE8" fill-rule="evenodd"/><path d="M0 0 467.538 5.35139" stroke="#CC0000" stroke-width="12.6667" stroke-linecap="round" stroke-miterlimit="8" fill="none" fill-rule="evenodd" transform="matrix(1 0 0 -1 401.5 171.851)"/><path d="M0 0 467.538 5.35139" stroke="#CC0000" stroke-width="12.6667" stroke-linecap="round" stroke-miterlimit="8" fill="none" fill-rule="evenodd" transform="matrix(1 0 0 -1 401.5 436.851)"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 82.48 77.59">
+  <defs>
+    <linearGradient id="lg" y1="12" x2="82.48" y2="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f2cc0c"/>
+      <stop offset="1" stop-color="#ff9830"/>
+    </linearGradient>
+  </defs>
+  <!-- UCL - dashed blue, just above the line's peak -->
+  <line x1="0" y1="14" x2="82" y2="14" stroke="#84aff1" stroke-width="4" stroke-dasharray="9 6"/>
+  <!-- LCL - dashed blue, just below the line's trough -->
+  <line x1="0" y1="52" x2="82" y2="52" stroke="#84aff1" stroke-width="4" stroke-dasharray="9 6"/>
+  <!-- Center line -->
+  <line x1="0" y1="33" x2="82" y2="33" stroke="#84aff1" stroke-width="2" stroke-opacity="0.7"/>
+  <!-- Exact yellow gradient line from Grafana's time series icon, shifted down -->
+  <g transform="translate(0, 20)">
+    <path fill="url(#lg)" d="M33.26,24a2,2,0,0,1-.83-.18l-14.7-6.66-15,5.71a2,2,0,1,1-1.42-3.74l15.8-6a2,2,0,0,1,1.53,0l14.16,6.41,15-16A2,2,0,0,1,50,3.16L65.15,9.73,79.38.33a2,2,0,1,1,2.2,3.34l-15.13,10a2,2,0,0,1-1.9.16L49.72,7.39l-15,16A2,2,0,0,1,33.26,24Z"/>
+  </g>
+</svg>

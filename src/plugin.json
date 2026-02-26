@@ -4,7 +4,7 @@
   "name": "SPC Chart",
   "id": "kensobi-spc-panel",
   "info": {
-    "keywords": ["panel", "spc", "chart", "kensobi"],
+    "keywords": ["panel", "spc", "chart", "kensobi", "xbar", "xmr", "control chart", "statistical process control", "quality", "shewhart", "control limits", "ucl", "lcl", "moving range", "six sigma", "process capability", "manufacturing"],
     "description": "Create common SPC charts like Xbar-R, XbarS, and XmR charts.",
     "author": {
       "name": "Kenso Software",

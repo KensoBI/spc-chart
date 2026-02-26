@@ -11,8 +11,8 @@ export function createXChartXmR(data: number[]): ControlChartData {
 
   return {
     centerLine: xMean,
-    upperControlLimit: xMean + (E2 * mRBar) / 1.128, // 1.128 is d2 for n=2
-    lowerControlLimit: xMean - (E2 * mRBar) / 1.128,
+    upperControlLimit: xMean + E2 * mRBar,
+    lowerControlLimit: xMean - E2 * mRBar,
     data: data,
   };
 }

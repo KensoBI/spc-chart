@@ -1,51 +1,75 @@
 # SPC Chart
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?logo=grafana&query=$.version&url=https://grafana.com/api/plugins/kensobi-spc-panel&label=Marketplace&prefix=v&color=F47A20)
+![Grafana](https://img.shields.io/badge/Grafana-11.6%2B-orange?logo=grafana)
 
-Welcome to the **KensoBI SPC Chart** panel for **Grafana**. This plugin enables you to easily create statistical process control (SPC) charts, including **Xbar-R**, **XbarS**, and **XmR** charts. It automatically calculates and displays control limits, with options to add your own custom limits. Additionally, you can group your samples into subgroups and aggregate them using methods such as **moving range**, **range**, **mean**, or **standard deviation**.
+The SPC Chart panel automatically calculates and displays control limits for **XmR**, **Xbar-R**, and **Xbar-S** charts — so you can monitor process stability, detect special cause variation, and make data-driven decisions in real time.
 
-![Main](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/SPC-chart.png)
-
-## Available Options
-
-- **Xbar-R, XbarS, and XmR Charts:** Create various types of SPC charts with a single click.
-
-- **Automatic Control Limits:** LCL (Lower Control Limit), UCL (Upper Control Limit), and mean are automatically calculated and displayed.
-
-- **Custom Limits:** Add your own limits for more tailored analysis.
-
-- **Subgrouping:** Group your samples into subgroups for analysis.
-
-- **Aggregation:** Aggregate your data by moving range, range, mean, or standard deviation.
-- **Alerting Support:** Support for Grafana alerting with alert states and annotations displayed on the chart.
-
-- **Threshold Visualization:** Configure and visualize alert thresholds alongside SPC control limits.
-
-- **Numeric X-axis Support:** Monitor indexed/sequential data (CSV imports, sample numbers, etc.) using numeric X-axis instead of time-based data. Similar to Grafana's Trend panel, enabling SPC analysis for non-time-series datasets.
+![SPC Chart with variable limits and custom control lines](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/spc-chart-variable-v2.png)
 
 
-## Alerting and Custom Annotations
+## Why SPC Chart?
 
-The SPC Chart panel supports Grafana alerting with annotations:
+Control charts are the foundation of statistical process control. They separate **common cause** variation (normal process behavior) from **special cause** variation (signals that something has changed). This plugin makes that analysis effortless:
 
-- **Alert States:** The panel displays alert states directly on the chart, making it easy to see when alerts are firing.
+- **Automatic control limits** — LCL, UCL, and Mean are calculated and displayed automatically based on the selected chart type
+- **Multiple chart types** — XmR for individual measurements, Xbar-R for small subgroups, Xbar-S for larger subgroups
+- **Custom control lines** — add Nominal, LSL, USL, or any custom reference line with static values or dynamic series lookup
+- **Fill regions** — visually highlight zones between control lines to show acceptable process ranges
 
-- **Alert Annotations:** Historical alert events are shown as annotations on the chart timeline, providing visual context for when process control issues occurred.
+![SPC Chart dashboard showing all chart types](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/spc-charts-v2.png)
 
-- **Threshold Configuration:** Configure alert thresholds in the panel's field configuration to define when alerts should trigger. These thresholds are displayed alongside your SPC control limits.
+## Features
 
-- **SPC-Based Alerts:** Create alert rules based on SPC control limits (UCL, LCL) to automatically detect when your process goes out of statistical control. For example:
-  - Alert when values exceed the Upper Control Limit (UCL)
-  - Alert when values fall below the Lower Control Limit (LCL)
-  - Alert on trends or patterns that indicate special cause variation
+| Feature | Description |
+|---------|-------------|
+| XmR charts | Individual (X) and Moving Range (mR) charts for single measurements |
+| Xbar-R charts | Subgroup mean (X-bar) and Range (R) charts for small subgroups |
+| Xbar-S charts | Subgroup mean (X-bar) and Standard Deviation (S) charts for larger subgroups |
+| Automatic control limits | LCL, UCL, and Mean calculated from the data using standard SPC formulas |
+| Custom control lines | Add Nominal, LSL, USL, or custom lines with static values or dynamic series lookup |
+| Subgrouping | Group consecutive measurements into subgroups of size 2-25 |
+| Aggregation | Aggregate raw data by moving range, range, mean, or standard deviation |
+| Fill regions | Color-fill areas between control lines to highlight process zones |
+| Alerting support | Grafana alerting integration with alert state annotations on the chart |
+| Custom annotations | Create, edit, and delete annotations directly on the chart |
+| Threshold visualization | Display alert thresholds alongside SPC control limits |
+| Dashboard variables | Control subgroup size across multiple panels with a single `subgroupSize` variable |
+| Feature queries | Exclude reference queries from SPC calculations |
 
-- Create custom annotations directly on the chart.
+## Use Cases
 
-To create an alert based on SPC limits, configure an alert rule in Grafana that uses the same query as your SPC chart, and set threshold conditions based on your calculated control limits.
+- **Manufacturing quality** — monitor process parameters and detect shifts before they produce defects
+- **IT operations** — track response times, error rates, or throughput to distinguish real incidents from normal variation
+- **Laboratory analysis** — control measurement systems and reagent performance over time
+- **Supply chain** — monitor delivery times, fill rates, or inventory levels for process stability
+- **Healthcare** — track clinical metrics and patient outcomes with statistical rigor
+
+## Requirements
+
+- Grafana **11.6.10** or later
+
+## Getting Started
+
+1. Install the plugin from the [Grafana Plugin Catalog](https://grafana.com/grafana/plugins/kensobi-spc-panel/)
+2. Add a new panel and select **SPC Chart** as the visualization
+3. Configure a query that returns time series data (a time field and one or more numeric value fields)
+4. Select a **Chart Type** (XmR, Xbar-R, or Xbar-S) to automatically calculate control limits
+
+The plugin comes with sample provisioned dashboards. Build and start the plugin to see them.
 
 ## Documentation
 
-Please see the full panel documentation at [KensoBI Docs](https://docs.kensobi.com/panels/spc-chart/).
+For detailed documentation, configuration guides, and formula references, see the [full documentation](https://docs.kensobi.com/panels/spc-chart/).
 
-**NOTE:** The plugin comes with sample provisioned dashboards. Build and start the plugin to see them.
+## Part of the KensoBI SPC Suite
+
+SPC Chart is part of a growing family of **Statistical Process Control** plugins for Grafana by Kenso Software:
+
+**[SPC Histogram Panel](https://github.com/KensoBI/spc-histogram)** — Distribution analysis with histograms, bell curves, and a built-in statistics table showing Cp, Cpk, Pp, and Ppk. Use it to understand process capability: is your process producing results within specification limits?
+
+**[SPC Pareto Panel](https://github.com/KensoBI/spc-pareto)** — Pareto analysis with automatic sorting, cumulative percentage lines, and 80/20 threshold highlighting. Use it to identify the vital few factors contributing to defects or issues.
+
+**[SPC CAD Panel](https://github.com/KensoBI/spc-cad)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
 
 ## Getting Help
 
@@ -56,12 +80,6 @@ If you have any questions or feedback, you can:
 
 Your feedback is always welcome!
 
-
 ## License
 
-This software is distributed under the [Apache License](https://raw.githubusercontent.com/KensoBI/spc-chart/main/LICENSE).
-
-
-## Notes
-
-Copyright (c) 2024 [Kenso Software](https://kensobi.com)
+This software is distributed under the [Apache License 2.0](https://raw.githubusercontent.com/KensoBI/spc-chart/main/LICENSE).

@@ -16,6 +16,9 @@
 **Compatibility:**
 - Maintains full backward compatibility with existing time-based SPC charts
 
+**Bug Fixes**
+- XmR calculation of LCL and UCL
+
 ## 2.1.1
 
 **New Features:**

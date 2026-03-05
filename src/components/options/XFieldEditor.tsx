@@ -1,9 +1,19 @@
 import React, { useMemo } from 'react';
-import { Combobox, type ComboboxOption, Icon, Tooltip } from '@grafana/ui';
-import { FieldType, StandardEditorProps } from '@grafana/data';
+import { Combobox, type ComboboxOption, Icon, Tooltip, useStyles2 } from '@grafana/ui';
+import { FieldType, GrafanaTheme2, StandardEditorProps } from '@grafana/data';
+import { css } from '@emotion/css';
 import { Options } from 'panelcfg';
 
+const getStyles = (theme: GrafanaTheme2) => ({
+  wrapper: css({
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(1),
+  }),
+});
+
 export const XFieldEditor = ({ value, onChange, context }: StandardEditorProps<string | undefined, Options>) => {
+  const styles = useStyles2(getStyles);
   const options = useMemo(() => {
     const fieldOptions: ComboboxOption[] = [{ label: 'Time (default)', value: '' }];
 
@@ -23,7 +33,7 @@ export const XFieldEditor = ({ value, onChange, context }: StandardEditorProps<s
   }, [context.data]);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div className={styles.wrapper}>
       <Combobox
         options={options}
         value={value || ''}

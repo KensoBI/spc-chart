@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import uPlot from 'uplot';
 import { colorManipulator } from '@grafana/data';
-import { UPlotConfigBuilder } from '@grafana/ui';
-
-const DEFAULT_TIMESERIES_FLAG_COLOR = '#03839e';
+import { UPlotConfigBuilder, useTheme2 } from '@grafana/ui';
 
 export type AnnotationBase = {
   title?: string;
@@ -50,11 +48,17 @@ export function isLimitAnnotationArray(value: any): value is LimitAnnotation[] {
 }
 
 export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations, config }) => {
+  const theme = useTheme2();
+  const fallbackColorRef = useRef(theme.colors.primary.main);
   const [plot, setPlot] = useState<uPlot>();
   const annotationsRef = useRef<LimitAnnotation[]>();
   const shouldRenderRef = useRef<boolean>(false);
   const bboxRef = useRef<DOMRect>();
   const hooksInitialized = useRef(false);
+
+  useEffect(() => {
+    fallbackColorRef.current = theme.colors.primary.main;
+  }, [theme]);
 
   useEffect(() => {
     annotationsRef.current = annotations.sort((a, b) => typeToValue(b.type) - typeToValue(a.type));
@@ -102,7 +106,7 @@ export const LimitAnnotations: React.FC<AnnotationsPluginProps> = ({ annotations
 
     for (let i = 0; i < annotationsRef.current.length; i++) {
       const entity = annotationsRef.current[i];
-      const lineColor = entity.color ?? DEFAULT_TIMESERIES_FLAG_COLOR;
+      const lineColor = entity.color ?? fallbackColorRef.current;
 
       if (entity.type === 'region') {
         const yKey = config.scales[1].props.scaleKey;

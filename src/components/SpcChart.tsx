@@ -86,24 +86,6 @@ export const SpcChartPanel = ({
       optionsWithVars.xField
     );
 
-    // Debug logging for numeric X mode
-    if (useNumericX) {
-      console.log('=== SPC Chart Debug (Numeric X Mode) ===');
-      console.log('xFieldIdx:', xFieldIdx);
-      console.log('xFieldName:', optionsWithVars.xField);
-      console.log('Number of frames:', preped.length);
-      preped.forEach((frame, frameIdx) => {
-        console.log(`Frame ${frameIdx} (${frame.name}):`);
-        console.log('  Fields:', frame.fields.length);
-        frame.fields.forEach((field, fieldIdx) => {
-          console.log(`    [${fieldIdx}] ${field?.name || 'UNDEFINED'} (${field?.type || 'NO TYPE'})`);
-          if (field?.values && fieldIdx < 3) {
-            console.log(`        Values (first 3):`, field.values.slice(0, 3));
-          }
-        });
-      });
-    }
-
     return { frames: preped, limitAnnotations, annotations: data.annotations };
   }, [data.series, data.annotations, fieldConfig, optionsWithVars, timeRange, xFieldIdx, useNumericX]);
 

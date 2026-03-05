@@ -23,16 +23,17 @@ import {
   Stack,
   ValuePicker,
   useStyles2,
+  useTheme2,
 } from '@grafana/ui';
 
 import { PositionInput, SpcChartTyp } from 'types';
 import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
 import { ControlLine, Options } from 'panelcfg';
 
-const defaultConstantColor = '#37872d';
-
 export const ControlLineEditor = ({ item, value, onChange, context }: StandardEditorProps<ControlLine[], Options>) => {
   const styles = useStyles2(getStyles);
+  const theme = useTheme2();
+  const defaultLineColor = theme.visualization.getColorByName('dark-green');
   const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
   const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp>(chartType);
@@ -434,9 +435,9 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                   />
                 </Field>
                 <Field label="Line color">
-                  <div style={{ width: '18px' }}>
+                  <div className={styles.colorPickerWrapper}>
                     <ColorPicker
-                      color={controlLine.lineColor ?? defaultConstantColor}
+                      color={controlLine.lineColor ?? defaultLineColor}
                       onChange={(color) => {
                         {
                           handleControlLineChange(index, 'lineColor', color);
@@ -478,11 +479,14 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    addControlwrapper: css`
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 8px;
-    `,
+    addControlwrapper: css({
+      display: 'flex',
+      flexDirection: 'column',
+      paddingBottom: theme.spacing(1),
+    }),
+    colorPickerWrapper: css({
+      width: theme.spacing(2.25),
+    }),
     controlItemWrapper: css({
       flex: 1,
       position: 'relative',

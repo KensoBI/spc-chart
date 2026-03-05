@@ -503,14 +503,16 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
   }, []);
 
   useLayoutEffect(() => {
-    // Check if we have annotations from DataFrame OR local annotations
+    // Check if we have annotations from DataFrame OR local annotations OR a new annotation being added
     const hasAnnotations = !!(
       (annotations && annotations.length > 0) ||
-      (annotationsRef.current && annotationsRef.current.length > 0)
+      (annotationsRef.current && annotationsRef.current.length > 0) ||
+      newAnnotation
     );
     shouldRenderRef.current = hasAnnotations;
 
-    if (!hooksInitialized.current && hasAnnotations) {
+    // Always initialize hooks on first mount to capture plot instance
+    if (!hooksInitialized.current) {
       config.addHook('init', (u) => {
         setPlot(u);
       });

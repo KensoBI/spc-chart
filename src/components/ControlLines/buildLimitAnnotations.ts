@@ -24,41 +24,56 @@ export function computeControlLine(series: DataFrame[], options: Options): Contr
 export function buildControlLineFrame(
   series: DataFrame[],
   controlLines: ControlLine[],
-  defaults: FieldConfigSource
+  defaults: FieldConfigSource,
+  xFieldIdx?: number
 ): DataFrame[] {
   if (!controlLines.length) {
     return [];
   }
 
-  let timeField = null;
+  const useNumericX = xFieldIdx != null;
+  let xField = null;
 
   for (let dataframe of series) {
-    timeField = dataframe.fields.find(
-      (field) => field.type === FieldType.time && (!field.state || !field.state.hideFrom || !field.state.hideFrom.viz)
-    );
-
-    if (timeField) {
-      break;
+    if (useNumericX) {
+      // Find the numeric X field by index
+      const field = dataframe.fields[xFieldIdx];
+      if (field && field.type === FieldType.number) {
+        xField = field;
+        break;
+      }
+    } else {
+      // Find the time field
+      xField = dataframe.fields.find(
+        (field) => field.type === FieldType.time && (!field.state || !field.state.hideFrom || !field.state.hideFrom.viz)
+      );
+      if (xField) {
+        break;
+      }
     }
   }
 
-  let timeValues = [new Date().toISOString()]; // Default to current date
+  let xValues: any[] = useNumericX ? [0] : [new Date().toISOString()]; // Default values
 
-  if (timeField) {
-    timeValues = [...timeField.values];
+  if (xField) {
+    xValues = [...xField.values];
   }
 
-  const timeFields = {
-    name: 'time',
-    type: FieldType.time,
-    values: timeValues,
+  // Create X-axis field - use numeric type in numeric X mode, time type otherwise
+  const xAxisField = {
+    name: useNumericX ? (xField?.name || 'x') : 'time',
+    type: useNumericX ? FieldType.number : FieldType.time,
+    values: xValues,
     config: {},
+    state: {},
   };
+
+  let fields: any[] = [xAxisField];
 
   const constantDataFrame: DataFrame = {
     name: 'control limits',
-    fields: [timeFields],
-    length: timeValues.length,
+    fields,
+    length: xValues.length,
   };
 
   const allIndexes = series.map((_, index) => index);
@@ -69,7 +84,7 @@ export function buildControlLineFrame(
     }
 
     const custom: GraphFieldConfig = {
-      transform: timeField === null ? GraphTransform.Constant : undefined, // this will allow grafana to transform this field into a constant
+      transform: xField === null ? GraphTransform.Constant : undefined, // this will allow grafana to transform this field into a constant
       lineWidth: cl.lineWidth,
       gradientMode: GraphGradientMode.None,
       lineInterpolation: LineInterpolation.Smooth,
@@ -79,7 +94,7 @@ export function buildControlLineFrame(
     const constant = {
       name: cl.name,
       type: FieldType.number,
-      values: timeFields.values.map(() => cl.position),
+      values: xAxisField.values.map(() => cl.position),
       config: {
         custom,
         color: {
@@ -211,7 +226,16 @@ function processComputedControlLines(
     }
 
     const frame = applicableSeries[cl.seriesIndex];
-    const numericField = frame.fields.find((field) => field.type === FieldType.number && field.state?.calcs);
+
+    // Find the target field - use specified field name if provided, otherwise find first numeric field
+    let numericField;
+    if (cl.field) {
+      numericField = frame.fields.find(
+        (field) => field.name === cl.field && field.type === FieldType.number && field.state?.calcs
+      );
+    } else {
+      numericField = frame.fields.find((field) => field.type === FieldType.number && field.state?.calcs);
+    }
 
     if (!numericField || !numericField.state?.calcs) {
       return cl; // Skip if no valid numeric field with cached calculations

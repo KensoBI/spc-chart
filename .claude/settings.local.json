@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:grafana.com)",
+      "Bash(npm outdated:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run test:ci:*)",
+      "Bash(npm view:*)",
+      "Bash(npm run build:*)",
+      "Bash(yarn build:*)",
+      "Bash(find:*)",
+      "Bash(yarn dev)",
+      "Bash(yarn tsc:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(yarn test:*)",
+      "Bash(yarn run build:*)",
+      "Bash(yarn why:*)",
+      "Bash(ls:*)",
+      "Bash(yarn list:*)",
+      "Bash(yarn test:ci:*)",
+      "Bash(grep:*)",
+      "Bash(yarn install:*)",
+      "Bash(yarn --frozen-lockfile)"
+    ]
+  }
+}

@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.0
+
+**New Features:**
+- **Numeric X-axis Support**: Added support for numeric X-axis to enable SPC charting for indexed/sequential data sources.
+  - New X-axis field selector allows switching between Time (default) and numeric fields
+  - Works similarly to Grafana's built-in Trend panel
+  - Perfect for analyzing data with sample numbers or sequence indices (e.g., 1, 2, 3...) instead of timestamps
+- **Multi-field Control Lines**: Enhanced control line functionality for datasets with multiple numeric fields.
+  - Field selector for computed control lines (LCL, UCL, Mean) when multiple numeric fields exist
+  - Automatically hidden when only one numeric field is present to reduce UI complexity
+  - Enables proper SPC monitoring of multiple measurements in a single dataset
+
+
+**Compatibility:**
+- Maintains full backward compatibility with existing time-based SPC charts
+
 ## 2.1.1
 
 **New Features:**

@@ -6,14 +6,13 @@ import { css } from '@emotion/css';
 import { AnnotationFormModal } from '../Annotations/AnnotationFormModal';
 import { deleteAnnotation } from '../Annotations/annotationApi';
 
-const DEFAULT_ALERT_COLOR = '#ff0000';
 const TRIANGLE_WIDTH = 8;
 const TRIANGLE_HEIGHT = 6;
 
 // Get status color and display text based on alert state
-const getStatusInfo = (status?: string, theme?: GrafanaTheme2): { color: string; displayText: string } => {
+const getStatusInfo = (status: string | undefined, theme: GrafanaTheme2): { color: string; displayText: string } => {
   if (!status) {
-    return { color: theme?.colors.text.secondary || '#999', displayText: 'Unknown' };
+    return { color: theme.colors.text.secondary, displayText: 'Unknown' };
   }
 
   const normalizedStatus = status.toLowerCase();
@@ -21,19 +20,19 @@ const getStatusInfo = (status?: string, theme?: GrafanaTheme2): { color: string;
   switch (normalizedStatus) {
     case 'alerting':
     case 'firing':
-      return { color: theme?.colors.error.text || '#e02f44', displayText: 'Alerting' };
+      return { color: theme.colors.error.text, displayText: 'Alerting' };
     case 'ok':
     case 'normal':
-      return { color: theme?.colors.success.text || '#56a64b', displayText: 'OK' };
+      return { color: theme.colors.success.text, displayText: 'OK' };
     case 'pending':
-      return { color: theme?.colors.warning.text || '#f79520', displayText: 'Pending' };
+      return { color: theme.colors.warning.text, displayText: 'Pending' };
     case 'nodata':
     case 'no_data':
-      return { color: theme?.colors.info.text || '#5794f2', displayText: 'No Data' };
+      return { color: theme.colors.info.text, displayText: 'No Data' };
     case 'error':
-      return { color: theme?.colors.error.text || '#e02f44', displayText: 'Error' };
+      return { color: theme.colors.error.text, displayText: 'Error' };
     default:
-      return { color: theme?.colors.text.secondary || '#999', displayText: status };
+      return { color: theme.colors.text.secondary, displayText: status };
   }
 };
 
@@ -282,6 +281,12 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
 }) => {
   const styles = useStyles2(getStyles);
   const theme = useTheme2();
+  const defaultAnnotationColorRef = useRef(theme.colors.error.main);
+
+  useEffect(() => {
+    defaultAnnotationColorRef.current = theme.colors.error.main;
+  }, [theme]);
+
   const [plot, setPlot] = useState<uPlot>();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null);
@@ -330,7 +335,7 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
       if (timeField && timeField.values.length > 0) {
         for (let i = 0; i < timeField.values.length; i++) {
           const timeValue = timeField.values[i];
-          const color = colorField?.values[i] || DEFAULT_ALERT_COLOR;
+          const color = colorField?.values[i] || defaultAnnotationColorRef.current;
           let status = statusField?.values[i];
 
           // If no status field, try to extract from tags
@@ -405,7 +410,7 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
           time: newAnnotation.time,
           text: newAnnotation.text,
           tags: newAnnotation.tags,
-          color: DEFAULT_ALERT_COLOR,
+          color: defaultAnnotationColorRef.current,
         };
 
         localAnnotationsRef.current.set(newAnnotation.id, newAnnotationData);
@@ -458,7 +463,7 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
       if (x >= u.bbox.left && x <= u.bbox.left + u.bbox.width) {
         // Draw dashed vertical line
         ctx.beginPath();
-        ctx.strokeStyle = annotation.color || DEFAULT_ALERT_COLOR;
+        ctx.strokeStyle = annotation.color || defaultAnnotationColorRef.current;
         ctx.lineWidth = 2;
         ctx.setLineDash([5, 5]);
         ctx.moveTo(x, u.bbox.top);
@@ -469,7 +474,7 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
         // Draw triangle at the bottom of the line (on canvas)
         const triangleY = u.bbox.top + u.bbox.height - TRIANGLE_HEIGHT;
         ctx.beginPath();
-        ctx.fillStyle = annotation.color || DEFAULT_ALERT_COLOR;
+        ctx.fillStyle = annotation.color || defaultAnnotationColorRef.current;
         ctx.moveTo(x, triangleY); // Top point
         ctx.lineTo(x - TRIANGLE_WIDTH / 2, triangleY + TRIANGLE_HEIGHT); // Bottom left
         ctx.lineTo(x + TRIANGLE_WIDTH / 2, triangleY + TRIANGLE_HEIGHT); // Bottom right
@@ -485,7 +490,7 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
         positions.push({
           x: screenX,
           y: screenY,
-          color: annotation.color || DEFAULT_ALERT_COLOR,
+          color: annotation.color || defaultAnnotationColorRef.current,
           annotation,
         });
       }

@@ -11,7 +11,7 @@ import {
 } from 'calcs/common';
 
 //apply data aggregations to all series and save results in field state as FieldCalcs
-export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
+export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: number): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
   const aggregationType = options.aggregationType ?? 'none';
   const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);
@@ -25,11 +25,19 @@ export function doSpcCalcs(series: DataFrame[], options: Options): DataFrame[] {
       fields: frame.fields.map((field) => {
         const updatedField = { ...field };
 
-        //todo check if we need time, maybe just numbers from 1 to field.length and save as not a time field type but a number?
-        //for now, just calculate mean time for each subgroup
-        if (updatedField.type === FieldType.time) {
+        // Check if this is the numeric X field (for trend/numeric x-axis mode)
+        const isNumericXField = xFieldIdx !== undefined && frame.fields.indexOf(field) === xFieldIdx;
+
+        // Aggregate time field or numeric X field when using subgroups
+        if (updatedField.type === FieldType.time || isNumericXField) {
           updatedField.values = aggregateSeries(updatedField.values, subgroupSize, AggregationType.Mean);
-        } else if (field.type === FieldType.number) {
+          // Don't process numeric X field as a value field
+          if (isNumericXField) {
+            return updatedField;
+          }
+        }
+
+        if (field.type === FieldType.number && !isNumericXField) {
           updatedField.state = updatedField.state || {};
 
           const fieldCalcs: FieldCalcs = {

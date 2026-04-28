@@ -12,6 +12,8 @@ export interface Options extends common.OptionsWithTimezones {
   controlLines: ControlLine[];
   featureQueryRefIds: string[];
   onSeriesColorChange: (label: string, color: string) => void;
+  /** Field name for numeric X-axis. When set, uses numeric X instead of time. */
+  xField?: string;
 }
 
 export interface FieldConfig extends common.GraphFieldConfig {}

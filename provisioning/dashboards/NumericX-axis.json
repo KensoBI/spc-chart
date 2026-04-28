@@ -1,0 +1,810 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Demonstrates SPC charts with a numeric X-axis (sample index) instead of a time axis.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "X individuals chart using a numeric sample index as the X-axis. The SPC calculations (mean, UCL, LCL) are computed automatically from the data.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Measurement",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+          "refId": "A"
+        }
+      ],
+      "title": "X-chart (XmR) — Numeric Index",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "Moving Range chart (companion to the X individuals chart) using a numeric sample index. Shows the absolute difference between consecutive measurements.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Moving Range",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "mR-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+          "refId": "A"
+        }
+      ],
+      "title": "mR-chart (XmR) — Numeric Index",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "Xbar chart using subgroups of size 5 with a numeric sample index. The X-axis represents subgroup numbers 1–10, each computed from 5 raw measurements.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Subgroup Mean",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+      "id": 3,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 5,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,measurement\n1,24.8\n2,25.3\n3,24.5\n4,26.1\n5,24.9\n6,25.7\n7,24.2\n8,25.5\n9,26.3\n10,24.6\n11,25.1\n12,24.8\n13,25.9\n14,24.3\n15,25.6\n16,26.4\n17,24.7\n18,25.2\n19,24.9\n20,25.8\n21,24.5\n22,25.4\n23,26.1\n24,24.8\n25,25.3\n26,25.0\n27,24.6\n28,25.7\n29,26.2\n30,24.4\n31,25.1\n32,24.9\n33,25.8\n34,24.7\n35,26.0\n36,25.3\n37,24.8\n38,25.5\n39,24.3\n40,26.1\n41,25.0\n42,24.7\n43,25.4\n44,26.3\n45,24.9\n46,25.6\n47,24.4\n48,25.1\n49,26.0\n50,24.8",
+          "refId": "A"
+        }
+      ],
+      "title": "X-chart (Xbar-R) — Numeric Index, Subgroup Size 5",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "R chart (companion to Xbar-R) using a numeric sample index. Shows the within-subgroup range for each group of 5 measurements.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Range",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 },
+      "id": 4,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "R-XbarR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 5,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,measurement\n1,24.8\n2,25.3\n3,24.5\n4,26.1\n5,24.9\n6,25.7\n7,24.2\n8,25.5\n9,26.3\n10,24.6\n11,25.1\n12,24.8\n13,25.9\n14,24.3\n15,25.6\n16,26.4\n17,24.7\n18,25.2\n19,24.9\n20,25.8\n21,24.5\n22,25.4\n23,26.1\n24,24.8\n25,25.3\n26,25.0\n27,24.6\n28,25.7\n29,26.2\n30,24.4\n31,25.1\n32,24.9\n33,25.8\n34,24.7\n35,26.0\n36,25.3\n37,24.8\n38,25.5\n39,24.3\n40,26.1\n41,25.0\n42,24.7\n43,25.4\n44,26.3\n45,24.9\n46,25.6\n47,24.4\n48,25.1\n49,26.0\n50,24.8",
+          "refId": "A"
+        }
+      ],
+      "title": "R-chart (Xbar-R) — Numeric Index, Subgroup Size 5",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "Two numeric series plotted against the same numeric X-axis. Shows how multiple measurement streams can share the same sample index.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 18 },
+      "id": 5,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "part_a",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean (A)",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "part_a",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL (A)",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "part_a",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL (A)",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,part_a,part_b\n1,50.2,48.5\n2,49.8,49.1\n3,51.1,47.8\n4,49.5,50.3\n5,50.8,48.9\n6,51.3,49.7\n7,49.2,50.5\n8,50.6,48.2\n9,51.5,49.8\n10,49.4,50.1\n11,50.1,48.7\n12,50.9,49.4\n13,49.7,50.8\n14,51.2,48.3\n15,50.3,49.6\n16,49.9,50.2\n17,51.0,48.9\n18,50.4,49.5\n19,49.6,50.7\n20,50.7,48.6",
+          "refId": "A"
+        }
+      ],
+      "title": "X-chart (XmR) — Two Series, Numeric Index",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "Demonstrates using a static custom control line (target / nominal value) with a numeric X-axis. The nominal value is entered manually in the control line editor.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Measurement",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 80 }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 18 },
+      "id": 6,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#37872d",
+            "lineWidth": 2,
+            "name": "Nominal",
+            "position": 50,
+            "positionInput": "Static",
+            "reducerId": "nominal",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 8,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 47,
+            "positionInput": "Static",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 8,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 53,
+            "positionInput": "Static",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.2.0",
+      "targets": [
+        {
+          "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+          },
+          "scenarioId": "csv_content",
+          "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+          "refId": "A"
+        }
+      ],
+      "title": "Numeric X-axis — Static Nominal / LSL / USL",
+      "type": "kensobi-spc-panel"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": ["spc", "numeric-x", "example"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "SPC Charts — Numeric X-axis",
+  "uid": "spc-numeric-x-v2",
+  "version": 1,
+  "weekStart": ""
+}

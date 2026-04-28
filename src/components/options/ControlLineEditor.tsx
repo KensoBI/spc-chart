@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { css } from '@emotion/css';
 import {
   DataFrame,
+  FieldType,
   GrafanaTheme2,
   SelectableValue,
   StandardEditorProps,
@@ -22,16 +23,17 @@ import {
   Stack,
   ValuePicker,
   useStyles2,
+  useTheme2,
 } from '@grafana/ui';
 
 import { PositionInput, SpcChartTyp } from 'types';
 import { ControlLineReducer, ControlLineReducerId, controlLineReducers } from 'data/spcReducers';
 import { ControlLine, Options } from 'panelcfg';
 
-const defaultConstantColor = '#37872d';
-
 export const ControlLineEditor = ({ item, value, onChange, context }: StandardEditorProps<ControlLine[], Options>) => {
   const styles = useStyles2(getStyles);
+  const theme = useTheme2();
+  const defaultLineColor = theme.visualization.getColorByName('dark-green');
   const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
   const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp>(chartType);
@@ -108,10 +110,22 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     }));
 
   function createControlLine(reducer: ControlLineReducer, seriesIndex: number): ControlLine {
+    // For computed control lines, try to set a default field
+    let defaultField = '';
+    if (reducer.computed) {
+      const frames = getFilteredDataFramesForReducer(reducer.id);
+      if (frames[seriesIndex]) {
+        const numericField = frames[seriesIndex].fields.find((field) => field.type === FieldType.number);
+        if (numericField) {
+          defaultField = numericField.name;
+        }
+      }
+    }
+
     return {
       reducerId: reducer.id,
       name: reducer.name,
-      field: '',
+      field: defaultField,
       positionInput: PositionInput.static,
       seriesIndex: seriesIndex,
       lineWidth: 2,
@@ -323,6 +337,41 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                     }}
                   />
                 </Field>
+                {isComputed(controlLine.reducerId) && (() => {
+                  const frame = getFilteredDataFramesForReducer(controlLine.reducerId).find(
+                    (_f, i) => i === controlLine.seriesIndex
+                  );
+                  const numericFields = frame?.fields.filter((field) => field.type === FieldType.number) ?? [];
+
+                  // Only show field selector if there are multiple numeric fields
+                  if (numericFields.length <= 1) {
+                    return null;
+                  }
+
+                  return (
+                    <Field
+                      label="Field"
+                      description="Select which field to calculate this control line for. Required when multiple numeric fields exist."
+                    >
+                      <Combobox
+                        placeholder="Field"
+                        isClearable={false}
+                        value={controlLine.field}
+                        options={numericFields.map<ComboboxOption<string>>((field) => ({
+                          value: field.name,
+                          label: field.display?.name ?? `${getFieldDisplayName(field)}`,
+                        }))}
+                        onChange={(value) => {
+                          if (!value) {
+                            return;
+                          }
+
+                          handleControlLineChange(index, 'field', value.value);
+                        }}
+                      />
+                    </Field>
+                  );
+                })()}
                 {!isComputed(controlLine.reducerId) && (
                   <>
                     <Field label="Position input">
@@ -386,9 +435,9 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
                   />
                 </Field>
                 <Field label="Line color">
-                  <div style={{ width: '18px' }}>
+                  <div className={styles.colorPickerWrapper}>
                     <ColorPicker
-                      color={controlLine.lineColor ?? defaultConstantColor}
+                      color={controlLine.lineColor ?? defaultLineColor}
                       onChange={(color) => {
                         {
                           handleControlLineChange(index, 'lineColor', color);
@@ -430,11 +479,14 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    addControlwrapper: css`
-      display: flex;
-      flex-direction: column;
-      padding-bottom: 8px;
-    `,
+    addControlwrapper: css({
+      display: 'flex',
+      flexDirection: 'column',
+      paddingBottom: theme.spacing(1),
+    }),
+    colorPickerWrapper: css({
+      width: theme.spacing(2.25),
+    }),
     controlItemWrapper: css({
       flex: 1,
       position: 'relative',

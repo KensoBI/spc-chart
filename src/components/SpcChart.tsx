@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { PanelProps, DashboardCursorSync } from '@grafana/data';
+import { PanelProps, DashboardCursorSync, FieldMatcherID, fieldMatchers, DataFrame } from '@grafana/data';
 import { config, PanelDataErrorView, locationService } from '@grafana/runtime';
 import {
   EventBusPlugin,
@@ -8,6 +8,7 @@ import {
   TimeSeries,
   TooltipPlugin2,
   usePanelContext,
+  ZoomPlugin,
 } from '@grafana/ui';
 
 import { useSubgroupSizeOptions } from 'components/options/useSubgroupSize';
@@ -22,6 +23,7 @@ import { AlertAnnotations } from 'components/ControlLines/AlertAnnotations';
 import { CustomTooltipContent, AnnotationFormModal } from 'components/Annotations';
 import { getTimezones, prepareGraphableFields } from 'utils';
 import { Options } from 'panelcfg';
+import { preparePlotFrame, XYFieldMatchers } from 'utils/preparePlotFrame';
 
 interface SpcChartPanelProps extends PanelProps<Options> {}
 
@@ -35,6 +37,7 @@ export const SpcChartPanel = ({
   fieldConfig,
   id,
   onOptionsChange,
+  onChangeTimeRange,
 }: SpcChartPanelProps) => {
   const { sync, eventBus } = usePanelContext();
 
@@ -56,19 +59,57 @@ export const SpcChartPanel = ({
     return match ? match[1] : undefined;
   }, []);
 
+  // Find numeric X field index if xField option is set
+  const xFieldIdx = useMemo(() => {
+    if (!optionsWithVars.xField) {
+      return undefined;
+    }
+    const frame = data.series[0];
+    if (!frame || !frame.fields) {
+      return undefined;
+    }
+    const idx = frame.fields.findIndex((f) => f && f.name === optionsWithVars.xField);
+    return idx >= 0 ? idx : undefined;
+  }, [optionsWithVars.xField, data.series]);
+
+  const useNumericX = xFieldIdx != null;
+
   const { frames, limitAnnotations, annotations } = useMemo(() => {
-    let samplesWithCalcs = doSpcCalcs(data.series, optionsWithVars);
+    let samplesWithCalcs = doSpcCalcs(data.series, optionsWithVars, xFieldIdx);
     const controlLines = computeControlLine(samplesWithCalcs, optionsWithVars);
     const limitAnnotations = buildLimitAnnotations(samplesWithCalcs, controlLines);
-    const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines, fieldConfig);
+    const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines, fieldConfig, xFieldIdx);
     const combined = samplesWithCalcs.concat(controlLineFrames);
-    const preped = prepareGraphableFields(combined, config.theme2, timeRange);
+    const preped = prepareGraphableFields(
+      combined,
+      config.theme2,
+      useNumericX ? undefined : timeRange,
+      xFieldIdx,
+      optionsWithVars.xField
+    );
 
     return { frames: preped, limitAnnotations, annotations: data.annotations };
-  }, [data.series, data.annotations, fieldConfig, optionsWithVars, timeRange]);
+  }, [data.series, data.annotations, fieldConfig, optionsWithVars, timeRange, xFieldIdx, useNumericX]);
 
   const timezones = useMemo(() => getTimezones(options.timezone, timeZone), [options.timezone, timeZone]);
   const cursorSync = sync?.() ?? DashboardCursorSync.Off;
+
+  // Callback to prepare frames for plotting with numeric X-axis
+  // This mirrors Grafana's Trend panel implementation
+  const preparePlotFrameCallback = useCallback(
+    (frames: DataFrame[], dimFields: XYFieldMatchers): DataFrame | null => {
+      // Override the X field matcher to use our numeric field
+      const modifiedDimFields = {
+        ...dimFields,
+        x: fieldMatchers.get(FieldMatcherID.byName).get(optionsWithVars.xField!),
+      };
+
+      // Call our preparePlotFrame function with modified dimFields
+      const result = preparePlotFrame(frames, modifiedDimFields);
+      return result ?? null;
+    },
+    [optionsWithVars.xField]
+  );
 
   // Annotation handlers
   const handleAddAnnotation = useCallback((time: number) => {
@@ -121,14 +162,14 @@ export const SpcChartPanel = ({
     }
   };
 
-  if (!frames) {
+  if (!frames || frames.length === 0) {
     return (
       <PanelDataErrorView
         panelId={id}
-        message="No data."
+        message={useNumericX ? 'No data. Numeric X-axis requires ascending numeric values.' : 'No data.'}
         fieldConfig={fieldConfig}
         data={data}
-        needsTimeField={true}
+        needsTimeField={!useNumericX}
         needsNumberField={true}
       />
     );
@@ -145,6 +186,7 @@ export const SpcChartPanel = ({
         height={height}
         legend={options.legend}
         options={options}
+        {...(useNumericX && { preparePlotFrame: preparePlotFrameCallback })}
       >
         {(uplotConfig, alignedFrame) => {
           return (
@@ -152,16 +194,21 @@ export const SpcChartPanel = ({
               {limitAnnotations.limits && (
                 <LimitAnnotations annotations={limitAnnotations.limits} config={uplotConfig} />
               )}
-              <AlertAnnotations
-                annotations={annotations}
-                config={uplotConfig}
-                timeZone={timeZone}
-                panelId={id}
-                dashboardUID={dashboardUID}
-                onAnnotationChange={handleAnnotationSuccess}
-                newAnnotation={newAnnotation}
-              />
+              {!useNumericX && ((annotations && annotations.length > 0) || newAnnotation) && (
+                <AlertAnnotations
+                  annotations={annotations}
+                  config={uplotConfig}
+                  timeZone={timeZone}
+                  panelId={id}
+                  dashboardUID={dashboardUID}
+                  onAnnotationChange={handleAnnotationSuccess}
+                  newAnnotation={newAnnotation}
+                />
+              )}
               <KeyboardPlugin config={uplotConfig} />
+              {!useNumericX && (
+                <ZoomPlugin config={uplotConfig} onZoom={onChangeTimeRange} />
+              )}
               {cursorSync !== DashboardCursorSync.Off && (
                 <EventBusPlugin config={uplotConfig} eventBus={eventBus} frame={alignedFrame} />
               )}
@@ -186,7 +233,7 @@ export const SpcChartPanel = ({
                       focusedPointIdx={focusedPointIdx}
                       frames={frames}
                       timeZone={timeZone}
-                      onAddAnnotation={handleAddAnnotation}
+                      onAddAnnotation={useNumericX ? undefined : handleAddAnnotation}
                       isPinned={isPinned}
                       onDismiss={dismiss}
                     />

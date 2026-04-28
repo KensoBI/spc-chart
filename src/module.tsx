@@ -9,6 +9,7 @@ import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor'
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { migrateOptions } from 'migrations';
 import { TimezonesEditor } from 'components/options/TimezonesEditor';
+import { XFieldEditor } from 'components/options/XFieldEditor';
 import { SpcChartPanel } from 'components/SpcChart';
 import { SortOrder } from '@grafana/schema';
 
@@ -76,12 +77,21 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
 
     commonOptionsBuilder.addLegendOptions(builder);
     builder.addCustomEditor({
+      id: 'xField',
+      name: 'X-axis field',
+      path: 'xField',
+      category: ['Axis'],
+      editor: XFieldEditor,
+      defaultValue: undefined,
+    });
+    builder.addCustomEditor({
       id: 'timezone',
       name: 'Time zone',
       path: 'timezone',
       category: ['Axis'],
       editor: TimezonesEditor,
       defaultValue: undefined,
+      showIf: (options) => !options.xField,
     });
   })
   .setDataSupport({ annotations: true, alertStates: true });

@@ -24,6 +24,9 @@ function reEnumFields(frames: DataFrame[]): DataFrame[] {
     return {
       ...frame,
       fields: frame.fields.map((field) => {
+        if (!field) {
+          return field;
+        }
         if (field.type === FieldType.enum) {
           let scaleKey = buildScaleKey(field.config, field.type);
           let allTexts = allTextsByKey.get(scaleKey);
@@ -72,9 +75,22 @@ export function prepareGraphableFields(
   theme: GrafanaTheme2,
   timeRange?: TimeRange,
   // numeric X requires a single frame where the first field is numeric
-  xNumFieldIdx?: number
+  xNumFieldIdx?: number,
+  xFieldName?: string
 ): DataFrame[] {
   if (!series?.length) {
+    return [];
+  }
+
+  // Filter out any frames with invalid fields and filter out undefined fields within frames
+  series = series
+    .map((frame) => ({
+      ...frame,
+      fields: (frame.fields || []).filter((f): f is Field => f != null),
+    }))
+    .filter((frame) => frame.fields.length > 0);
+
+  if (!series.length) {
     return [];
   }
 
@@ -82,14 +98,34 @@ export function prepareGraphableFields(
 
   let useNumericX = xNumFieldIdx != null;
 
-  // Make sure the numeric x field is first in the frame
-  if (xNumFieldIdx != null && xNumFieldIdx > 0) {
-    series = [
-      {
-        ...series[0],
-        fields: [series[0].fields[xNumFieldIdx], ...series[0].fields.filter((f, i) => i !== xNumFieldIdx)],
-      },
-    ];
+  // Make sure the numeric x field is first in each frame
+  if (useNumericX) {
+    series = series.map((frame) => {
+      // Find X field by name first (more reliable across different frames)
+      // Fall back to index for frames where we can't find by name
+      let xFieldIndex = xFieldName
+        ? frame.fields.findIndex((f) => f?.name === xFieldName)
+        : xNumFieldIdx!;
+
+      // If not found by name and index is out of bounds, check if first field is already numeric (control line frames)
+      if (xFieldIndex < 0 || xFieldIndex >= frame.fields.length) {
+        if (frame.fields[0]?.type === FieldType.number) {
+          xFieldIndex = 0; // Already in correct position
+        } else {
+          return frame; // Can't find X field, return unchanged
+        }
+      }
+
+      // Only reorder if X field is not already first
+      if (xFieldIndex > 0) {
+        const xField = frame.fields[xFieldIndex];
+        return {
+          ...frame,
+          fields: [xField, ...frame.fields.filter((_, i) => i !== xFieldIndex)],
+        };
+      }
+      return frame;
+    });
   }
 
   // some datasources simply tag the field as time, but don't convert to milli epochs
@@ -108,7 +144,7 @@ export function prepareGraphableFields(
 
   loopy: for (let frame of series) {
     for (let field of frame.fields) {
-      if (field.type === FieldType.enum && ++enumFieldsCount > 1) {
+      if (field && field.type === FieldType.enum && ++enumFieldsCount > 1) {
         series = reEnumFields(series);
         break loopy;
       }
@@ -137,14 +173,25 @@ export function prepareGraphableFields(
 
     for (let fieldIdx = 0; fieldIdx < frameFields?.length; fieldIdx++) {
       const field = frameFields[fieldIdx];
+      if (!field) {
+        continue;
+      }
 
       switch (field.type) {
         case FieldType.time:
-          hasTimeField = true;
-          fields.push(field);
+          if (!useNumericX) {
+            hasTimeField = true;
+            fields.push(field);
+          }
+          // In numeric X mode, skip time field entirely
           break;
         case FieldType.number:
-          hasValueField = useNumericX ? fieldIdx > 0 : true;
+          // In numeric X mode, first field is the X axis
+          if (useNumericX && fieldIdx === 0) {
+            hasTimeField = true; // Treat numeric X as time equivalent
+          } else {
+            hasValueField = true;
+          }
           copy = {
             ...field,
             values: field.values.map((v) => {
@@ -154,7 +201,6 @@ export function prepareGraphableFields(
               return v;
             }),
           };
-
           fields.push(copy);
           break; // ok
         case FieldType.enum:
@@ -226,7 +272,7 @@ const matchEnumColorToSeriesColor = (frames: DataFrame[], theme: GrafanaTheme2) 
   const { palette } = theme.visualization;
   for (const frame of frames) {
     for (const field of frame.fields) {
-      if (field.type === FieldType.enum) {
+      if (field && field.type === FieldType.enum) {
         const namedColor = palette[field.state?.seriesIndex! % palette.length];
         const hexColor = theme.visualization.getColorByName(namedColor);
         const enumConfig = field.config.type!.enum!;
@@ -243,6 +289,7 @@ export const setClassicPaletteIdxs = (frames: DataFrame[], theme: GrafanaTheme2,
   frames.forEach((frame) => {
     frame.fields.forEach((field, fieldIdx) => {
       if (
+        field &&
         fieldIdx !== skipFieldIdx &&
         (field.type === FieldType.number || field.type === FieldType.boolean || field.type === FieldType.enum)
       ) {

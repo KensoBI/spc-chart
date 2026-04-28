@@ -1,5 +1,5 @@
 import React from 'react';
-import { getTemplateSrv } from '@grafana/runtime';
+import { getTemplateSrv, locationService } from '@grafana/runtime';
 import { VariableWithOptions } from '@grafana/data';
 import { SpcChartTyp, SUBGROUP_SIZE_VARIABLE } from 'types';
 import { Options } from 'panelcfg';
@@ -15,22 +15,12 @@ function getSubgroupSizeVariable(): number {
 }
 
 function useSearchParamsChange() {
-  const [searchParams, setSearchParams] = React.useState(new URLSearchParams(window.location.search));
+  const [searchParams, setSearchParams] = React.useState(locationService.getSearch());
 
   React.useEffect(() => {
-    const handleSearchParamsChange = () => {
-      setSearchParams(new URLSearchParams(window.location.search));
-    };
-
-    // Add listeners for both 'pushstate' and 'popstate' events
-    window.addEventListener('popstate', handleSearchParamsChange);
-    window.addEventListener('pushstate', handleSearchParamsChange);
-
-    return () => {
-      // Clean up event listeners
-      window.removeEventListener('popstate', handleSearchParamsChange);
-      window.removeEventListener('pushstate', handleSearchParamsChange);
-    };
+    return locationService.getHistory().listen(() => {
+      setSearchParams(locationService.getSearch());
+    });
   }, []);
 
   return searchParams;

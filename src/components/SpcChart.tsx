@@ -8,6 +8,7 @@ import {
   TimeSeries,
   TooltipPlugin2,
   usePanelContext,
+  ZoomPlugin,
 } from '@grafana/ui';
 
 import { useSubgroupSizeOptions } from 'components/options/useSubgroupSize';
@@ -36,6 +37,7 @@ export const SpcChartPanel = ({
   fieldConfig,
   id,
   onOptionsChange,
+  onChangeTimeRange,
 }: SpcChartPanelProps) => {
   const { sync, eventBus } = usePanelContext();
 
@@ -204,6 +206,9 @@ export const SpcChartPanel = ({
                 />
               )}
               <KeyboardPlugin config={uplotConfig} />
+              {!useNumericX && (
+                <ZoomPlugin config={uplotConfig} onZoom={onChangeTimeRange} />
+              )}
               {cursorSync !== DashboardCursorSync.Off && (
                 <EventBusPlugin config={uplotConfig} eventBus={eventBus} frame={alignedFrame} />
               )}

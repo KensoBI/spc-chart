@@ -65,11 +65,18 @@ For detailed documentation, configuration guides, and formula references, see th
 
 SPC Chart is part of a growing family of **Statistical Process Control** plugins for Grafana by Kenso Software:
 
-**[SPC Histogram Panel](https://github.com/KensoBI/spc-histogram)** — Distribution analysis with histograms, bell curves, and a built-in statistics table showing Cp, Cpk, Pp, and Ppk. Use it to understand process capability: is your process producing results within specification limits?
+**[SPC Histogram Panel](https://grafana.com/grafana/plugins/kensobi-spchistogram-panel/)** — Distribution analysis with histograms, bell curves, and a built-in statistics table showing Cp, Cpk, Pp, and Ppk. Use it to understand process capability: is your process producing results within specification limits?
 
-**[SPC Pareto Panel](https://github.com/KensoBI/spc-pareto)** — Pareto analysis with automatic sorting, cumulative percentage lines, and 80/20 threshold highlighting. Use it to identify the vital few factors contributing to defects or issues.
+**[SPC Pareto Panel](https://grafana.com/grafana/plugins/kensobi-spcpareto-panel/)** — Pareto analysis with automatic sorting, cumulative percentage lines, and 80/20 threshold highlighting. Use it to identify the vital few factors contributing to defects or issues.
 
-**[SPC CAD Panel](https://github.com/KensoBI/spc-cad)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
+**[SPC CAD Panel](https://grafana.com/grafana/plugins/kensobi-spccad-panel/)** — Brings 3D geometry into the picture, letting you bind the data from control charts and histograms to physical features on your parts.
+
+**[SPC Box Plot Panel](https://grafana.com/grafana/plugins/kensobi-spcboxplot-panel/)** — Box-and-whisker plots with built-in SPC. Automatically groups measurements into subgroups, computes quartiles and outliers, and overlays Xf-Rf control limits to detect shifts in both process location and spread.
+
+**[SPC Bullet Panel](https://grafana.com/grafana/plugins/kensobi-spcbullet-panel/)** — Compact bullet charts and progress bars with optional SPC metrics (Cpk, Cp, Ppk, Pp, Sigma Level) for dense KPI dashboards.
+
+**[SPC Characteristic Datasource](https://grafana.com/grafana/plugins/kensobi-spccharacteristic-datasource/)** — The datasource that powers the SPC CAD panel. Connects to your measurement database (PostgreSQL or MSSQL), lets you select features and characteristics through a point-and-click interface, and returns SPC statistics, time series measurements, and forecast data — no SQL required.
+
 
 ## Getting Help
 

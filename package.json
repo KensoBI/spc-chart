@@ -1,6 +1,6 @@
 {
   "name": "kensobi-spc-panel",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Create common SPC charts like Xbar-R, XbarS, and XmR charts.",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",

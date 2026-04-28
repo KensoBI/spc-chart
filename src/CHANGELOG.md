@@ -3,6 +3,11 @@
 ## 2.2.0
 
 **New Features:**
+- **Drag-to-Zoom**: Added drag-to-select time range zoom, consistent with Grafana's built-in Time Series panel.
+  - Click and drag on the chart to zoom into a selected time window
+  - Dashboard time range updates automatically, triggering a data re-query
+  - Double-click on the chart to zoom back out
+  - Only active in time-based mode (not applicable when using a numeric X-axis)
 - **Numeric X-axis Support**: Added support for numeric X-axis to enable SPC charting for indexed/sequential data sources.
   - New X-axis field selector allows switching between Time (default) and numeric fields
   - Works similarly to Grafana's built-in Trend panel

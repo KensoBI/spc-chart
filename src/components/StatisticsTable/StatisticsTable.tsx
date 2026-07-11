@@ -4,7 +4,7 @@ import { DataFrame, FieldType, getDisplayProcessor, formattedValueToString, Graf
 import { IconButton, InteractiveTable, useStyles2 } from '@grafana/ui';
 import { CellProps } from 'react-table';
 import { Options } from 'panelcfg';
-import { SpcChartTyp } from 'types';
+import { listStatisticsColumns } from 'registry/statisticsColumns';
 import { calculateSeriesStatistics, SeriesStatistics } from './calculateCapabilityIndices';
 
 interface StatisticsTableProps {
@@ -87,101 +87,33 @@ export const StatisticsTable: React.FC<StatisticsTableProps> = ({
     [statistics]
   );
 
-  const showControlLimits = options.chartType !== SpcChartTyp.none;
-  const hasCapabilityData = statistics.some((s) => s.cp != null);
   const selectedColumns = options.statisticsTableColumns;
   const isColumnVisible = useCallback(
     (id: string) => !selectedColumns || selectedColumns.length === 0 || selectedColumns.includes(id),
     [selectedColumns]
   );
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const availabilityContext = { options, statistics };
+
+    return [
       {
         id: 'seriesName' as const,
         header: 'Series',
         sortType: 'string' as const,
       },
-      {
-        id: 'n' as const,
-        header: 'n',
-        cell: ({ row }: CellProps<TableRow>) => row.original.n,
+      ...listStatisticsColumns().map((col) => ({
+        id: col.id,
+        header: col.header,
+        cell: ({ row }: CellProps<TableRow>) => {
+          const value = col.getValue(row.original);
+          return col.formatted && typeof value !== 'string' ? formatValue(value) : value;
+        },
         sortType: 'number' as const,
-        visible: () => isColumnVisible('n'),
-      },
-      {
-        id: 'mean' as const,
-        header: 'Mean',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.mean),
-        sortType: 'number' as const,
-        visible: () => isColumnVisible('mean'),
-      },
-      {
-        id: 'stdDev' as const,
-        header: 'Std Dev',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.stdDev),
-        sortType: 'number' as const,
-        visible: () => isColumnVisible('stdDev'),
-      },
-      {
-        id: 'min' as const,
-        header: 'Min',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.min),
-        sortType: 'number' as const,
-        visible: () => isColumnVisible('min'),
-      },
-      {
-        id: 'max' as const,
-        header: 'Max',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.max),
-        sortType: 'number' as const,
-        visible: () => isColumnVisible('max'),
-      },
-      {
-        id: 'lcl' as const,
-        header: 'LCL',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.lcl),
-        sortType: 'number' as const,
-        visible: () => showControlLimits && isColumnVisible('lcl'),
-      },
-      {
-        id: 'ucl' as const,
-        header: 'UCL',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.ucl),
-        sortType: 'number' as const,
-        visible: () => showControlLimits && isColumnVisible('ucl'),
-      },
-      {
-        id: 'cp' as const,
-        header: 'Cp',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.cp),
-        sortType: 'number' as const,
-        visible: () => hasCapabilityData && isColumnVisible('cp'),
-      },
-      {
-        id: 'cpk' as const,
-        header: 'Cpk',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.cpk),
-        sortType: 'number' as const,
-        visible: () => hasCapabilityData && isColumnVisible('cpk'),
-      },
-      {
-        id: 'pp' as const,
-        header: 'Pp',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.pp),
-        sortType: 'number' as const,
-        visible: () => hasCapabilityData && isColumnVisible('pp'),
-      },
-      {
-        id: 'ppk' as const,
-        header: 'Ppk',
-        cell: ({ row }: CellProps<TableRow>) => formatValue(row.original.ppk),
-        sortType: 'number' as const,
-        visible: () => hasCapabilityData && isColumnVisible('ppk'),
-      },
-    ],
-    [formatValue, showControlLimits, hasCapabilityData, isColumnVisible]
-  );
+        visible: () => (col.isAvailable?.(availabilityContext) ?? true) && isColumnVisible(col.id),
+      })),
+    ];
+  }, [formatValue, isColumnVisible, options, statistics]);
 
   if (tableData.length === 0) {
     return null;

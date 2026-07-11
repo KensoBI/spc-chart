@@ -46,5 +46,5 @@ export interface ControlLine {
   lineColor: string;
   fillDirection: number;
   fillOpacity: number;
-  reducerId: ControlLineReducerId;
+  reducerId: ControlLineReducerId | string;
 }

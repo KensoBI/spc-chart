@@ -9,6 +9,8 @@ import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
 import { migrateOptions } from 'migrations';
+import { listChartTypes } from 'registry/chartTypes';
+import 'registry/builtinChartTypes';
 import { TimezonesEditor } from 'components/options/TimezonesEditor';
 import { XFieldEditor } from 'components/options/XFieldEditor';
 import { SpcChartPanel } from 'components/SpcChart';
@@ -26,12 +28,7 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
         allowCustomValue: false,
         options: [
           { label: 'none', value: SpcChartTyp.none },
-          { label: 'X chart (XmR)', value: SpcChartTyp.x_XmR },
-          { label: 'mR chart (XmR)', value: SpcChartTyp.mR_XmR },
-          { label: 'X chart (Xbar-R)', value: SpcChartTyp.x_XbarR },
-          { label: 'R chart (Xbar-R)', value: SpcChartTyp.r_XbarR },
-          { label: 'X chart (Xbar-S)', value: SpcChartTyp.x_XbarS },
-          { label: 'S chart (Xbar-S)', value: SpcChartTyp.s_XbarS },
+          ...listChartTypes().map((chartType) => ({ label: chartType.label, value: chartType.id as SpcChartTyp })),
         ],
       },
 

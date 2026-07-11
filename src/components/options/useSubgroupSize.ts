@@ -3,6 +3,8 @@ import { getTemplateSrv, locationService } from '@grafana/runtime';
 import { VariableWithOptions } from '@grafana/data';
 import { SpcChartTyp, SUBGROUP_SIZE_VARIABLE } from 'types';
 import { Options } from 'panelcfg';
+import { getChartType } from 'registry/chartTypes';
+import 'registry/builtinChartTypes';
 
 function getSubgroupSizeVariable(): number {
   const variables = getTemplateSrv().getVariables();
@@ -26,17 +28,19 @@ function useSearchParamsChange() {
   return searchParams;
 }
 
-function validateSubgroupSize(subgroupSize: number, chartType: SpcChartTyp): number {
+function validateSubgroupSize(subgroupSize: number, chartType: SpcChartTyp | string): number {
   // When chartType === none, allow any positive number for subgroupSize
   if (chartType === SpcChartTyp.none) {
     return Math.max(subgroupSize, 1); // Only ensure it's greater than 0
   }
 
-  if (chartType === SpcChartTyp.mR_XmR || chartType === SpcChartTyp.x_XmR) {
-    return 1;
+  const definition = getChartType(chartType);
+  if (!definition) {
+    // Unknown chart type persisted in the dashboard: keep the historical clamp.
+    return Math.min(Math.max(subgroupSize, 2), 25);
   }
 
-  return Math.min(Math.max(subgroupSize, 2), 25);
+  return Math.min(Math.max(subgroupSize, definition.subgroupSize.min), definition.subgroupSize.max);
 }
 
 export function useSubgroupSizeOptions(options: Options): { options: Options; isDashboardVariable: boolean } {
@@ -65,7 +69,7 @@ export function useSubgroupSizeOptions(options: Options): { options: Options; is
 
 export function useSubgroupSize(
   subgroupSize: number,
-  chartType: SpcChartTyp
+  chartType: SpcChartTyp | string
 ): { subgroupSize: number; isDashboardVariable: boolean } {
   const searchParams = useSearchParamsChange().get(`var-${SUBGROUP_SIZE_VARIABLE}`);
   const subgroupSizeVar = getSubgroupSizeVariable();

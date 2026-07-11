@@ -1,15 +1,25 @@
 import { DataFrame, FieldCalcs, FieldType } from '@grafana/data';
 import { Options } from 'panelcfg';
-import { calculateControlCharts, calculateStandardStats } from 'calcs/standard';
+import { calculateStandardStats } from 'calcs/standard';
 import { controlLineReducers } from './spcReducers';
 import { AggregationType } from 'types';
-import { calculateNumericRange, calculateSampleStandardDeviation, chunkArray } from 'calcs/common';
+import { calculateNumericRange } from 'calcs/common';
+import { aggregateSeries, isValidNumber } from './aggregation';
+import { computeChartType, SpcCalcContext } from 'registry/chartTypes';
+import 'registry/builtinChartTypes';
 
 //apply data aggregations to all series and save results in field state as FieldCalcs
 export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: number): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
-  const aggregationType = options.aggregationType ?? 'none';
+  const aggregationType = options.aggregationType ?? AggregationType.none;
   const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);
+
+  const calcContext: SpcCalcContext = {
+    subgroupSize,
+    aggregationType,
+    options,
+    chartOptions: options.chartOptions,
+  };
 
   return series.map((frame, frameIndex) => {
     const shouldCalculateStandardStats =
@@ -46,7 +56,7 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
           updatedField.state.calcs = fieldCalcs;
 
           //calculate control charts
-          const controlChartData = calculateControlCharts(updatedField, options.chartType, subgroupSize);
+          const controlChartData = computeChartType(updatedField, options.chartType, calcContext);
           if (controlChartData) {
             updatedField.values = controlChartData.data;
             updatedField.state.calcs.lcl = controlChartData.lowerControlLimit;
@@ -74,55 +84,4 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
       }),
     };
   });
-}
-
-function isValidNumber(value: unknown): value is number {
-  return typeof value === 'number' && !Number.isNaN(value);
-}
-
-// Aggregate each subgroup over its valid numbers only: nulls must not coerce to 0 and NaN must
-// not poison the result. A subgroup without enough valid values yields null (a gap in the chart).
-function aggregateSeries(
-  values: number[],
-  subgroupSize: number,
-  aggregationType: AggregationType
-): Array<number | null> {
-  if (subgroupSize === 1) {
-    if (aggregationType === AggregationType.MovingRange) {
-      // A moving range is only defined when both neighbours are valid numbers.
-      const movingRanges: Array<number | null> = [];
-      for (let i = 1; i < values.length; i++) {
-        movingRanges.push(
-          isValidNumber(values[i]) && isValidNumber(values[i - 1]) ? Math.abs(values[i] - values[i - 1]) : null
-        );
-      }
-      return movingRanges;
-    }
-    return values;
-  }
-
-  const subgroups = chunkArray(values, subgroupSize);
-
-  if (aggregationType === AggregationType.Range) {
-    return subgroups.map((subgroup) => {
-      const valid = subgroup.filter(isValidNumber);
-      return valid.length > 0 ? Math.max(...valid) - Math.min(...valid) : null;
-    });
-  }
-
-  if (aggregationType === AggregationType.Mean) {
-    return subgroups.map((subgroup) => {
-      const valid = subgroup.filter(isValidNumber);
-      return valid.length > 0 ? valid.reduce((sum, value) => sum + value, 0) / valid.length : null;
-    });
-  }
-
-  if (aggregationType === AggregationType.StandardDeviation) {
-    return subgroups.map((subgroup) => {
-      const valid = subgroup.filter(isValidNumber);
-      return valid.length > 1 ? calculateSampleStandardDeviation(valid) : null;
-    });
-  }
-
-  return values;
 }

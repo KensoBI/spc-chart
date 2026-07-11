@@ -30,7 +30,11 @@ export function getC4(n: number): number {
  *
  * Returns null when the estimate is undefined (not enough data).
  */
-export function estimateSigmaWithin(values: number[], chartType: SpcChartTyp, subgroupSize: number): number | null {
+export function estimateSigmaWithin(
+  values: number[],
+  chartType: SpcChartTyp | string,
+  subgroupSize: number
+): number | null {
   const isChartSubgroupSize = subgroupSize >= 2 && subgroupSize <= 25;
 
   switch (chartType) {

@@ -18,13 +18,27 @@ export enum ControlLineReducerId {
 type SpcReducer = (field: Field, subgroupSize: number) => FieldCalcs;
 
 export interface ControlLineReducer {
-  id: ControlLineReducerId;
+  /** Built-in reducers use ControlLineReducerId; registered ones may use any stable string. */
+  id: ControlLineReducerId | string;
   name: string;
   description?: string;
   computed: boolean;
   isStandard: boolean;
   color: string;
   reduce?: SpcReducer;
+}
+
+/**
+ * Register an additional control-line reducer (e.g. sigma-zone or stage
+ * lines). Re-registering an existing id replaces the built-in definition.
+ */
+export function registerControlLineReducer(reducer: ControlLineReducer): void {
+  const existing = controlLineReducers.findIndex((r) => r.id === reducer.id);
+  if (existing >= 0) {
+    controlLineReducers[existing] = reducer;
+  } else {
+    controlLineReducers.push(reducer);
+  }
 }
 
 export const controlLineReducers: ControlLineReducer[] = [

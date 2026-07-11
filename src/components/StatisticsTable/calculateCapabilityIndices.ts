@@ -4,6 +4,8 @@ import { ControlLineReducerId } from 'data/spcReducers';
 import { PositionInput } from 'types';
 import { estimateSigmaWithin, calculateCapability } from 'calcs/capability';
 import { calculateStandardStats } from 'calcs/standard';
+import { getChartType } from 'registry/chartTypes';
+import 'registry/builtinChartTypes';
 
 export interface SeriesStatistics {
   seriesName: string;
@@ -85,7 +87,16 @@ export function calculateSeriesStatistics(
       const sigmaOverall = rawStats.stdDev ?? null;
 
       const rawValues = rawField.values.filter((v: unknown): v is number => typeof v === 'number' && !Number.isNaN(v));
-      const sigmaWithin = estimateSigmaWithin(rawValues, options.chartType, options.subgroupSize);
+      // Chart types may bring their own within-sigma estimator; the standard
+      // Shewhart estimators in calcs/capability remain the fallback.
+      const chartTypeDef = getChartType(options.chartType);
+      const sigmaWithin = chartTypeDef?.estimateSigmaWithin
+        ? chartTypeDef.estimateSigmaWithin(rawValues, {
+            subgroupSize: options.subgroupSize,
+            options,
+            chartOptions: options.chartOptions,
+          })
+        : estimateSigmaWithin(rawValues, options.chartType, options.subgroupSize);
 
       const { cp, cpk, pp, ppk } = calculateCapability(mean, sigmaWithin, sigmaOverall, lsl, usl);
 

@@ -3,6 +3,7 @@ import { Options } from 'panelcfg';
 import { controlLineReducers } from 'data/spcReducers';
 import { PositionInput } from 'types';
 import { SeriesStatistics } from 'components/StatisticsTable/calculateCapabilityIndices';
+import { listStatisticsColumns, StatisticsColumnDefinition } from 'registry/statisticsColumns';
 
 export interface ResolvedControlLine {
   name: string;
@@ -26,33 +27,36 @@ function csvRow(fields: Array<string | number | null | undefined>): string {
   return fields.map(escapeCsvField).join(',');
 }
 
-const ALL_STAT_COLUMNS = ['n', 'mean', 'stdDev', 'min', 'max', 'lcl', 'ucl', 'cp', 'cpk', 'pp', 'ppk'] as const;
-
-const STAT_HEADERS: Record<string, string> = {
-  n: 'n',
-  mean: 'Mean',
-  stdDev: 'Std Dev',
-  min: 'Min',
-  max: 'Max',
-  lcl: 'LCL',
-  ucl: 'UCL',
-  cp: 'Cp',
-  cpk: 'Cpk',
-  pp: 'Pp',
-  ppk: 'Ppk',
-};
-
-function getVisibleColumns(visibleColumns?: string[]): string[] {
+function getVisibleColumns(visibleColumns?: string[]): StatisticsColumnDefinition[] {
+  const allColumns = listStatisticsColumns();
   if (!visibleColumns || visibleColumns.length === 0) {
-    return [...ALL_STAT_COLUMNS];
+    return allColumns;
   }
-  return ALL_STAT_COLUMNS.filter((col) => visibleColumns.includes(col));
+  return allColumns.filter((col) => visibleColumns.includes(col.id));
+}
+
+/** Everything an extra CSV section may need. options/frames are absent when the caller has none. */
+export interface CsvSectionContext {
+  statistics: SeriesStatistics[];
+  controlLines: ResolvedControlLine[];
+  options?: Options;
+  frames?: DataFrame[];
+}
+
+export type CsvSectionBuilder = (ctx: CsvSectionContext) => string | null;
+
+const csvSectionBuilders: CsvSectionBuilder[] = [];
+
+/** Register an additional export section, appended after Statistics and Control Lines. */
+export function registerCsvSection(builder: CsvSectionBuilder): void {
+  csvSectionBuilders.push(builder);
 }
 
 export function buildExportCsv(
   statistics: SeriesStatistics[],
   controlLines: ResolvedControlLine[],
-  visibleColumns?: string[]
+  visibleColumns?: string[],
+  sectionContext?: { options: Options; frames: DataFrame[] }
 ): string {
   const sections: string[] = [];
   const cols = getVisibleColumns(visibleColumns);
@@ -65,20 +69,27 @@ export function buildExportCsv(
     sections.push(buildControlLinesSection(controlLines));
   }
 
+  // Registered extra sections
+  for (const builder of csvSectionBuilders) {
+    const section = builder({ statistics, controlLines, ...sectionContext });
+    if (section) {
+      sections.push(section);
+    }
+  }
+
   return sections.join('\n\n');
 }
 
-function buildStatisticsSection(statistics: SeriesStatistics[], cols: string[]): string {
+function buildStatisticsSection(statistics: SeriesStatistics[], cols: StatisticsColumnDefinition[]): string {
   const lines: string[] = [];
 
   // Header
   lines.push(csvRow(['Statistics']));
-  lines.push(csvRow(['Series', ...cols.map((c) => STAT_HEADERS[c] || c)]));
+  lines.push(csvRow(['Series', ...cols.map((col) => col.header)]));
 
   // Data rows
   for (const stat of statistics) {
-    const values = cols.map((col) => stat[col as keyof SeriesStatistics] as number | null);
-    lines.push(csvRow([stat.seriesName, ...values]));
+    lines.push(csvRow([stat.seriesName, ...cols.map((col) => col.getValue(stat))]));
   }
 
   return lines.join('\n');

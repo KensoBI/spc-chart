@@ -31,8 +31,12 @@ import { preparePlotFrame, XYFieldMatchers } from 'utils/preparePlotFrame';
 import { StatisticsTable } from 'components/StatisticsTable/StatisticsTable';
 import { calculateSeriesStatistics } from 'components/StatisticsTable/calculateCapabilityIndices';
 import { buildExportCsv, downloadCsv, generateExportFilename, resolveControlLines } from 'utils/exportCsv';
+import { SpcChartExtensions } from 'components/extensions';
 
-interface SpcChartPanelProps extends PanelProps<Options> {}
+interface SpcChartPanelProps extends PanelProps<Options> {
+  /** Optional extension seams; see SpcChartExtensions. A wrapper panel supplies these. */
+  extensions?: SpcChartExtensions;
+}
 
 export const SpcChartPanel = ({
   data,
@@ -45,6 +49,7 @@ export const SpcChartPanel = ({
   id,
   onOptionsChange,
   onChangeTimeRange,
+  extensions,
 }: SpcChartPanelProps) => {
   const { sync, eventBus } = usePanelContext();
 
@@ -202,11 +207,15 @@ export const SpcChartPanel = ({
 
   const theme = useTheme2();
   const showTable = optionsWithVars.showStatisticsTable === true;
+  const TooltipContent = extensions?.tooltipContent ?? CustomTooltipContent;
 
   const handleExport = useCallback(() => {
     const statistics = calculateSeriesStatistics(samples, optionsWithVars, samplesWithCalcs, rawSamples);
     const controlLines = resolveControlLines(samplesWithCalcs, optionsWithVars);
-    const csv = buildExportCsv(statistics, controlLines, optionsWithVars.statisticsTableColumns);
+    const csv = buildExportCsv(statistics, controlLines, optionsWithVars.statisticsTableColumns, {
+      options: optionsWithVars,
+      frames: samplesWithCalcs,
+    });
     downloadCsv(csv, generateExportFilename());
   }, [samples, optionsWithVars, samplesWithCalcs, rawSamples]);
 
@@ -264,7 +273,12 @@ export const SpcChartPanel = ({
             x={contextMenu.x}
             y={contextMenu.y}
             onClose={() => setContextMenu(null)}
-            renderMenuItems={() => <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />}
+            renderMenuItems={() => (
+              <>
+                <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />
+                {extensions?.contextMenuItems?.({ options: optionsWithVars, frames, onOptionsChange })}
+              </>
+            )}
           />
         )}
         <div
@@ -288,6 +302,15 @@ export const SpcChartPanel = ({
                   {limitAnnotations.limits && (
                     <LimitAnnotations annotations={limitAnnotations.limits} config={uplotConfig} />
                   )}
+                  {extensions?.plotOverlays?.map((Overlay, index) => (
+                    <Overlay
+                      key={index}
+                      config={uplotConfig}
+                      alignedFrame={alignedFrame}
+                      frames={frames}
+                      options={optionsWithVars}
+                    />
+                  ))}
                   {!useNumericX && ((annotations && annotations.length > 0) || newAnnotation) && (
                     <AlertAnnotations
                       annotations={annotations}
@@ -319,7 +342,7 @@ export const SpcChartPanel = ({
                       }
 
                       return (
-                        <CustomTooltipContent
+                        <TooltipContent
                           data={alignedFrame}
                           focusedSeriesIdx={closestSeriesIdx}
                           focusedPointIdx={focusedPointIdx}

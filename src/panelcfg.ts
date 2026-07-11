@@ -6,9 +6,11 @@ export interface Options extends common.OptionsWithTimezones {
   legend: common.VizLegendOptions;
   orientation?: common.VizOrientation;
   tooltip: common.VizTooltipOptions;
-  chartType: SpcChartTyp;
+  chartType: SpcChartTyp | string;
   subgroupSize: number;
   aggregationType: AggregationType;
+  /** Per-chart-type parameters, keyed and interpreted by the chart type that owns them. Opaque to the panel. */
+  chartOptions?: Record<string, unknown>;
   controlLines: ControlLine[];
   featureQueryRefIds: string[];
   onSeriesColorChange: (label: string, color: string) => void;
@@ -44,5 +46,5 @@ export interface ControlLine {
   lineColor: string;
   fillDirection: number;
   fillOpacity: number;
-  reducerId: ControlLineReducerId;
+  reducerId: ControlLineReducerId | string;
 }

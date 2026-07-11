@@ -36,7 +36,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   const defaultLineColor = theme.visualization.getColorByName('dark-green');
   const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
-  const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp>(chartType);
+  const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp | string>(chartType);
 
   if (chartType !== selectedChartType) {
     //selected chart type option was changed
@@ -44,7 +44,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
 
     if (chartType === SpcChartTyp.none) {
       // remove lcl, ucl if they exist
-      const spcControlIds = [ControlLineReducerId.lcl, ControlLineReducerId.ucl];
+      const spcControlIds: Array<ControlLineReducerId | string> = [ControlLineReducerId.lcl, ControlLineReducerId.ucl];
       const newControlLines = value.filter((cl) => !spcControlIds.includes(cl.reducerId));
 
       onChange(newControlLines);
@@ -177,7 +177,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     }
   }
 
-  function getFilteredDataFramesForReducer(reducer: ControlLineReducerId): DataFrame[] {
+  function getFilteredDataFramesForReducer(reducer: ControlLineReducerId | string): DataFrame[] {
     if (!isComputed(reducer)) {
       return context.data;
     }
@@ -193,7 +193,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     return context.data.filter((frame) => !featureQueryRefIds || !featureQueryRefIds.includes(frame.refId!));
   }
 
-  function getAvailableSeriesIndexForReducer(reducer: ControlLineReducerId): number {
+  function getAvailableSeriesIndexForReducer(reducer: ControlLineReducerId | string): number {
     const usedIndex = value.filter((existingCl) => existingCl.reducerId === reducer).map((i) => i.seriesIndex);
     const allIndexes = getFilteredDataFramesForReducer(reducer).map((_, index) => index);
     const availableIndex = allIndexes.filter((i) => !usedIndex.includes(i));
@@ -258,7 +258,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
     return <span>{controlLine.name}</span>;
   }
 
-  function isComputed(reducerId: ControlLineReducerId): boolean {
+  function isComputed(reducerId: ControlLineReducerId | string): boolean {
     const reducer = controlLineReducers.find((r) => r.id === reducerId);
 
     if (reducer) {

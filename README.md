@@ -16,7 +16,7 @@ Control charts are the foundation of statistical process control. They separate 
 - **Fill regions** — visually highlight zones between control lines to show acceptable process ranges
 
 
-![SPC Chart dashboard showing all chart types](src/img/spc-charts-v2.png)
+![SPC Chart dashboard showing all chart types](src/img/numeric-x-table.png)
 
 ## Built for Grafana
 

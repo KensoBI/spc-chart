@@ -34,3 +34,4 @@ e2e-results/
 
 .eslintcache
 copydist.py
+.claude/settings.local.json

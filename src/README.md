@@ -16,7 +16,7 @@ Control charts are the foundation of statistical process control. They separate 
 - **Custom control lines** — add Nominal, LSL, USL, or any custom reference line with static values or dynamic series lookup
 - **Fill regions** — visually highlight zones between control lines to show acceptable process ranges
 
-![SPC Chart dashboard showing all chart types](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/spc-charts-v2.png)
+![SPC Chart dashboard showing all chart types](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/numeric-x-table.png)
 
 ## Features
 

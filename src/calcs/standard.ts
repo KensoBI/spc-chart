@@ -1,9 +1,8 @@
 import { Field, FieldCalcs, FieldType } from '@grafana/data';
 import { isNumber } from 'lodash';
 import { ControlChartData, SpcChartTyp } from 'types';
-import { createXbarChartForXbarR, createRChartForXbarR } from './xbarr';
-import { createXbarChartForXbarS, createSChartForXbarS } from './xbars';
-import { createXChartXmR, createMRChartXmR } from './xmr';
+import { computeChartType } from 'registry/chartTypes';
+import 'registry/builtinChartTypes';
 import { calculateSampleStandardDeviation } from './common';
 
 export function calculateStandardStats(field: Field): FieldCalcs {
@@ -85,29 +84,8 @@ export function calculateStandardStats(field: Field): FieldCalcs {
 
 export function calculateControlCharts(
   field: Field,
-  chartType: SpcChartTyp,
+  chartType: SpcChartTyp | string,
   subgroupSize: number
 ): ControlChartData | null {
-  // Ignore null and non-number values
-  const values = field.values.filter(
-    (value) => value !== null && value !== undefined && typeof value === 'number' && !Number.isNaN(value)
-  );
-  const isValidSubgroupSize = (size: number) => size >= 2 && size <= 25;
-
-  switch (chartType) {
-    case SpcChartTyp.x_XbarR:
-      return isValidSubgroupSize(subgroupSize) ? createXbarChartForXbarR(values, subgroupSize) : null;
-    case SpcChartTyp.r_XbarR:
-      return isValidSubgroupSize(subgroupSize) ? createRChartForXbarR(values, subgroupSize) : null;
-    case SpcChartTyp.x_XbarS:
-      return isValidSubgroupSize(subgroupSize) ? createXbarChartForXbarS(values, subgroupSize) : null;
-    case SpcChartTyp.s_XbarS:
-      return isValidSubgroupSize(subgroupSize) ? createSChartForXbarS(values, subgroupSize) : null;
-    case SpcChartTyp.x_XmR:
-      return createXChartXmR(values);
-    case SpcChartTyp.mR_XmR:
-      return createMRChartXmR(values);
-    default:
-      return null;
-  }
+  return computeChartType(field, chartType, { subgroupSize });
 }

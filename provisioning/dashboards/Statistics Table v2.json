@@ -1,0 +1,567 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 6,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Xbar-R chart with LSL/USL pulled from a reference (feature) series. Enable \"Show statistics table\" in the panel options to see n, mean, std dev, min/max, control limits, and Cp/Cpk/Pp/Ppk process capability indices calculated from the raw measurements.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XbarR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "lcl",
+          "ucl",
+          "cp",
+          "cpk",
+          "pp",
+          "ppk"
+        ],
+        "subgroupSize": 5,
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.3.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,10,0,5",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "max": 10,
+          "min": 0,
+          "noise": 0,
+          "refId": "B",
+          "scenarioId": "random_walk"
+        }
+      ],
+      "title": "X chart (Xbar-R) with specification limits",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "description": "Individual-measurement XmR chart with no LSL/USL configured. The statistics table still reports n, mean, std dev, min/max and the calculated control limits — Cp/Cpk/Pp/Ppk stay blank (–) until a specification limit is added, since capability always needs both an LSL and a USL.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#F2495C",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          }
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "lcl",
+          "ucl",
+          "cp",
+          "cpk",
+          "pp",
+          "ppk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "max": 5,
+          "min": -5,
+          "noise": 0,
+          "refId": "B",
+          "scenarioId": "random_walk"
+        }
+      ],
+      "title": "X chart (XmR) — no specification limits",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "Two data series (B, C) share a single LSL/USL pulled from the reference (feature) series A, as no series-specific limit is configured for either one. The statistics table lists both series with their own n/mean/std dev, calculated against the shared specification limits — the chart type is \"none\" here, so LCL/UCL are left out of the table via the column picker. Right-click the panel and choose \"Download CSV\" to export these numbers.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 32
+      },
+      "id": 3,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#1F60C4",
+            "lineWidth": 2,
+            "name": "Mean B",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 10,
+            "lineColor": "#8AB8FF",
+            "lineWidth": 2,
+            "name": "Mean C",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 1
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "cp",
+          "cpk",
+          "pp",
+          "ppk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.3.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl,nominal\r\ncharacteristic1,12,2,7",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 12,
+          "min": 2,
+          "noise": 0,
+          "refId": "B",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        },
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "hide": false,
+          "max": 12,
+          "min": 2,
+          "noise": 0,
+          "refId": "C",
+          "scenarioId": "random_walk",
+          "seriesCount": 1
+        }
+      ],
+      "title": "Two series sharing one specification limit",
+      "type": "kensobi-spc-panel"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Statistics Table v2",
+  "uid": "spc-stats-table-v2",
+  "version": 1
+}

@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.3.0
+
+**New Features:**
+- **Statistics Table**: An optional table below the chart summarizing each series — number of measurements, mean, standard deviation, min/max, control limits (LCL/UCL), and process capability (Cp, Cpk, Pp, Ppk).
+  - Turned off by default, so existing dashboards look exactly the same until you enable "Show statistics table" in the panel options
+  - Choose which columns to display
+  - Capability values follow the Minitab convention: they are calculated from your raw measurements and your LSL/USL specification lines, so you get the same Cp/Cpk regardless of which chart of a pair (X̄ or R/S) you are viewing
+- **CSV Export**: Right-click the panel and choose "Download CSV" (or use the download button on the statistics table) to export the statistics and control line values.
+
+**Calculation Accuracy Fixes:**
+
+After upgrading, some charts may show slightly different control limits than before. The new values are the correct ones:
+
+- **S chart**: The lower control limit was calculated with an incorrect factor. If you use S charts, expect the LCL line to move to its correct position.
+- **Leftover measurements**: When the data doesn't divide evenly into subgroups (for example 17 measurements with subgroup size 5), the leftover measurements no longer distort the center line and control limits. The last, smaller subgroup is still drawn as a point on the chart, but limits are estimated from complete subgroups only, so they may shift slightly compared to previous versions.
+- **Missing values**: Gaps in the data were previously counted as the value 0, which could visibly skew subgroup averages, ranges, and standard deviations. Missing values are now ignored, and a subgroup with no usable measurements appears as a gap in the line.
+- **Too little data**: When there aren't enough measurements to calculate control limits yet, the chart no longer draws limit lines in wrong places (such as at zero). The lines appear automatically once enough data arrives.
+
+**Security:**
+- Updated third-party components to address known vulnerabilities and added an automated vulnerability check to the release process.
+
 ## 2.2.0
 
 **New Features:**

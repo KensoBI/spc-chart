@@ -3,12 +3,7 @@ import { Options } from 'panelcfg';
 import { calculateControlCharts, calculateStandardStats } from 'calcs/standard';
 import { controlLineReducers } from './spcReducers';
 import { AggregationType } from 'types';
-import {
-  calculateMovingRanges,
-  calculateNumericRange,
-  calculateSampleStandardDeviation,
-  chunkArray,
-} from 'calcs/common';
+import { calculateNumericRange, calculateSampleStandardDeviation, chunkArray } from 'calcs/common';
 
 //apply data aggregations to all series and save results in field state as FieldCalcs
 export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: number): DataFrame[] {
@@ -62,7 +57,8 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
             updatedField.values = aggregateSeries(updatedField.values, subgroupSize, aggregationType);
           }
 
-          updatedField.state.range = calculateNumericRange(updatedField.values);
+          // Compute the range over valid numbers only so nulls (gaps) and NaN do not distort it.
+          updatedField.state.range = calculateNumericRange(updatedField.values.filter(isValidNumber));
 
           if (shouldCalculateStandardStats) {
             const standardStats = calculateStandardStats(updatedField);
@@ -80,10 +76,27 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
   });
 }
 
-function aggregateSeries(values: number[], subgroupSize: number, aggregationType: AggregationType): number[] {
+function isValidNumber(value: unknown): value is number {
+  return typeof value === 'number' && !Number.isNaN(value);
+}
+
+// Aggregate each subgroup over its valid numbers only: nulls must not coerce to 0 and NaN must
+// not poison the result. A subgroup without enough valid values yields null (a gap in the chart).
+function aggregateSeries(
+  values: number[],
+  subgroupSize: number,
+  aggregationType: AggregationType
+): Array<number | null> {
   if (subgroupSize === 1) {
     if (aggregationType === AggregationType.MovingRange) {
-      return calculateMovingRanges(values);
+      // A moving range is only defined when both neighbours are valid numbers.
+      const movingRanges: Array<number | null> = [];
+      for (let i = 1; i < values.length; i++) {
+        movingRanges.push(
+          isValidNumber(values[i]) && isValidNumber(values[i - 1]) ? Math.abs(values[i] - values[i - 1]) : null
+        );
+      }
+      return movingRanges;
     }
     return values;
   }
@@ -91,18 +104,24 @@ function aggregateSeries(values: number[], subgroupSize: number, aggregationType
   const subgroups = chunkArray(values, subgroupSize);
 
   if (aggregationType === AggregationType.Range) {
-    //calculate range for each subgroup
-    return subgroups.map((subgroup) => Math.max(...subgroup) - Math.min(...subgroup));
+    return subgroups.map((subgroup) => {
+      const valid = subgroup.filter(isValidNumber);
+      return valid.length > 0 ? Math.max(...valid) - Math.min(...valid) : null;
+    });
   }
 
   if (aggregationType === AggregationType.Mean) {
-    //calculate mean for each subgroup
-    return subgroups.map((subgroup) => subgroup.reduce((sum, value) => sum + value, 0) / subgroup.length);
+    return subgroups.map((subgroup) => {
+      const valid = subgroup.filter(isValidNumber);
+      return valid.length > 0 ? valid.reduce((sum, value) => sum + value, 0) / valid.length : null;
+    });
   }
 
   if (aggregationType === AggregationType.StandardDeviation) {
-    //calculate standard deviation for each subgroup
-    return subgroups.map(calculateSampleStandardDeviation);
+    return subgroups.map((subgroup) => {
+      const valid = subgroup.filter(isValidNumber);
+      return valid.length > 1 ? calculateSampleStandardDeviation(valid) : null;
+    });
   }
 
   return values;

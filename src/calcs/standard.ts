@@ -28,6 +28,7 @@ export function calculateStandardStats(field: Field): FieldCalcs {
   }
 
   let validValueFound = false;
+  const validValues: number[] = [];
 
   for (let i = 0; i < data.length; i++) {
     const currentValue = data[i];
@@ -45,6 +46,7 @@ export function calculateStandardStats(field: Field): FieldCalcs {
       validValueFound = true;
     }
 
+    validValues.push(currentValue);
     calcs.last = currentValue;
     calcs.count++;
     calcs.sum += currentValue;
@@ -62,9 +64,9 @@ export function calculateStandardStats(field: Field): FieldCalcs {
     calcs.mean = calcs.sum / calcs.count;
   }
 
-  if (calcs.count > 0) {
-    calcs.stdDev = calculateSampleStandardDeviation(data);
-  }
+  // Sample standard deviation needs at least two valid values; compute it over the
+  // filtered values so nulls and NaNs cannot distort it.
+  calcs.stdDev = calcs.count > 1 ? calculateSampleStandardDeviation(validValues) : null;
 
   if (calcs.max !== null && calcs.min !== null) {
     calcs.range = calcs.max - calcs.min;

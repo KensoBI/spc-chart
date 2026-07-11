@@ -34,7 +34,8 @@
     ],
     "screenshots": [
       { "name": "SPC charts with variable", "path": "img/spc-chart-variable-v2.png" }, 
-      { "name": "SPC charts", "path": "img/spc-charts-v2.png" }
+      { "name": "SPC charts", "path": "img/spc-charts-v2.png" },
+      { "name": "Numeric X with SPC table", "path": "img/numeric-x-table.png" }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"

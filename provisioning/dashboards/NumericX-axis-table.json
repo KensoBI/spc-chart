@@ -1,0 +1,1183 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "admfq52",
+    "namespace": "default",
+    "uid": "0f653a1d-07c3-4f82-977b-92c293866cac",
+    "resourceVersion": "1783767847608004",
+    "generation": 1,
+    "creationTimestamp": "2026-07-11T11:04:07Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "4243100158287872"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "access-policy:service",
+      "grafana.app/managedBy": "classic-file-provisioning",
+      "grafana.app/managerId": "Sample dashboard provider",
+      "grafana.app/sourceChecksum": "46a5f0d8279a30fc22af61215a21de26",
+      "grafana.app/sourcePath": "/etc/grafana/provisioning/dashboards/NumericX-axis-table.json",
+      "grafana.app/sourceTimestamp": "1783732294000",
+      "grafana.app/folder": ""
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "Demonstrates SPC charts with a numeric X-axis (sample index) instead of a time axis. Adds SPC table",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "X individuals chart using a numeric sample index as the X-axis. The SPC calculations (mean, UCL, LCL) are computed automatically from the data.",
+          "id": 1,
+          "links": [],
+          "title": "X-chart (XmR) — Numeric Index",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Measurement",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XmR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Moving Range chart (companion to the X individuals chart) using a numeric sample index. Shows the absolute difference between consecutive measurements.",
+          "id": 2,
+          "links": [],
+          "title": "mR-chart (XmR) — Numeric Index",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Moving Range",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "mR-XmR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,measurement\n1,24.8\n2,25.3\n3,24.5\n4,26.1\n5,24.9\n6,25.7\n7,24.2\n8,25.5\n9,26.3\n10,24.6\n11,25.1\n12,24.8\n13,25.9\n14,24.3\n15,25.6\n16,26.4\n17,24.7\n18,25.2\n19,24.9\n20,25.8\n21,24.5\n22,25.4\n23,26.1\n24,24.8\n25,25.3\n26,25.0\n27,24.6\n28,25.7\n29,26.2\n30,24.4\n31,25.1\n32,24.9\n33,25.8\n34,24.7\n35,26.0\n36,25.3\n37,24.8\n38,25.5\n39,24.3\n40,26.1\n41,25.0\n42,24.7\n43,25.4\n44,26.3\n45,24.9\n46,25.6\n47,24.4\n48,25.1\n49,26.0\n50,24.8",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Xbar chart using subgroups of size 5 with a numeric sample index. The X-axis represents subgroup numbers 1–10, each computed from 5 raw measurements.",
+          "id": 3,
+          "links": [],
+          "title": "X-chart (Xbar-R) — Numeric Index, Subgroup Size 5",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Subgroup Mean",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XbarR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 5,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,measurement\n1,24.8\n2,25.3\n3,24.5\n4,26.1\n5,24.9\n6,25.7\n7,24.2\n8,25.5\n9,26.3\n10,24.6\n11,25.1\n12,24.8\n13,25.9\n14,24.3\n15,25.6\n16,26.4\n17,24.7\n18,25.2\n19,24.9\n20,25.8\n21,24.5\n22,25.4\n23,26.1\n24,24.8\n25,25.3\n26,25.0\n27,24.6\n28,25.7\n29,26.2\n30,24.4\n31,25.1\n32,24.9\n33,25.8\n34,24.7\n35,26.0\n36,25.3\n37,24.8\n38,25.5\n39,24.3\n40,26.1\n41,25.0\n42,24.7\n43,25.4\n44,26.3\n45,24.9\n46,25.6\n47,24.4\n48,25.1\n49,26.0\n50,24.8",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "R chart (companion to Xbar-R) using a numeric sample index. Shows the within-subgroup range for each group of 5 measurements.",
+          "id": 4,
+          "links": [],
+          "title": "R-chart (Xbar-R) — Numeric Index, Subgroup Size 5",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Range",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "R-XbarR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 5,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,part_a,part_b\n1,50.2,48.5\n2,49.8,49.1\n3,51.1,47.8\n4,49.5,50.3\n5,50.8,48.9\n6,51.3,49.7\n7,49.2,50.5\n8,50.6,48.2\n9,51.5,49.8\n10,49.4,50.1\n11,50.1,48.7\n12,50.9,49.4\n13,49.7,50.8\n14,51.2,48.3\n15,50.3,49.6\n16,49.9,50.2\n17,51.0,48.9\n18,50.4,49.5\n19,49.6,50.7\n20,50.7,48.6",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Two numeric series plotted against the same numeric X-axis. Shows how multiple measurement streams can share the same sample index.",
+          "id": 5,
+          "links": [],
+          "title": "X-chart (XmR) — Two Series, Numeric Index",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XmR",
+                "controlLines": [
+                  {
+                    "field": "part_a",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean (A)",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "part_a",
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL (A)",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "part_a",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL (A)",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "TestData"
+                      },
+                      "group": "grafana-testdata-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "csvContent": "sample,measurement\n1,50.2\n2,49.8\n3,51.1\n4,49.5\n5,50.8\n6,51.3\n7,49.2\n8,50.6\n9,51.5\n10,49.4\n11,50.1\n12,50.9\n13,49.7\n14,51.2\n15,50.3\n16,49.9\n17,51.0\n18,50.4\n19,49.6\n20,50.7\n21,51.1\n22,49.3\n23,50.5\n24,51.4\n25,49.8",
+                        "scenarioId": "csv_content"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Demonstrates using a static custom control line (target / nominal value) with a numeric X-axis. The nominal value is entered manually in the control line editor.",
+          "id": 6,
+          "links": [],
+          "title": "Numeric X-axis — Static Nominal / LSL / USL",
+          "vizConfig": {
+            "group": "kensobi-spc-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "Measurement",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 2,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "short"
+                },
+                "overrides": []
+              },
+              "options": {
+                "aggregationType": "none",
+                "chartType": "none",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#37872d",
+                    "lineWidth": 2,
+                    "name": "Nominal",
+                    "position": 50,
+                    "positionInput": "Static",
+                    "reducerId": "nominal",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": -1,
+                    "fillOpacity": 8,
+                    "lineColor": "#C4162A",
+                    "lineWidth": 2,
+                    "name": "LSL",
+                    "position": 47,
+                    "positionInput": "Static",
+                    "reducerId": "lsl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 8,
+                    "lineColor": "#C4162A",
+                    "lineWidth": 2,
+                    "name": "USL",
+                    "position": 53,
+                    "positionInput": "Static",
+                    "reducerId": "usl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "sample"
+              }
+            },
+            "version": "2.3.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              },
+              "height": 11,
+              "width": 12,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              },
+              "height": 11,
+              "width": 12,
+              "x": 12,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              },
+              "height": 11,
+              "width": 12,
+              "x": 0,
+              "y": 11
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              },
+              "height": 11,
+              "width": 12,
+              "x": 12,
+              "y": 11
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              },
+              "height": 15,
+              "width": 12,
+              "x": 0,
+              "y": 22
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              },
+              "height": 15,
+              "width": 12,
+              "x": 12,
+              "y": 22
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "SPC Charts — Numeric X-axis -table",
+    "variables": []
+  }
+}

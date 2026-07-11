@@ -18,7 +18,7 @@ export function computeControlLine(series: DataFrame[], options: Options): Contr
   const computedControlLines = processComputedControlLines(series, controlLines, options.featureQueryRefIds);
   const allControlLines = processNonComputedControlLines(series, computedControlLines);
 
-  return allControlLines.filter((p) => p.position !== undefined);
+  return allControlLines.filter((p) => p.position != null);
 }
 
 export function buildControlLineFrame(
@@ -61,7 +61,7 @@ export function buildControlLineFrame(
 
   // Create X-axis field - use numeric type in numeric X mode, time type otherwise
   const xAxisField = {
-    name: useNumericX ? (xField?.name || 'x') : 'time',
+    name: useNumericX ? xField?.name || 'x' : 'time',
     type: useNumericX ? FieldType.number : FieldType.time,
     values: xValues,
     config: {},
@@ -241,11 +241,13 @@ function processComputedControlLines(
       return cl; // Skip if no valid numeric field with cached calculations
     }
 
-    // Assign the computed value to the position
+    // Assign the computed value to the position. When the statistic could not be computed
+    // (insufficient data yields null), drop the line instead of falling back to the editor
+    // default position, which would draw a spurious line at 0.
     const computedValue = numericField.state.calcs[cl.reducerId];
     return {
       ...cl,
-      position: computedValue ?? cl.position, // Keep existing position if computed value is undefined
+      position: computedValue ?? undefined,
     };
   });
 

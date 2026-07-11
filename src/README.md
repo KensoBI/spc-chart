@@ -15,6 +15,7 @@ Control charts are the foundation of statistical process control. They separate 
 - **Multiple chart types** — XmR for individual measurements, Xbar-R for small subgroups, Xbar-S for larger subgroups
 - **Custom control lines** — add Nominal, LSL, USL, or any custom reference line with static values or dynamic series lookup
 - **Fill regions** — visually highlight zones between control lines to show acceptable process ranges
+- **Statistics table** — an optional table below the chart summarizing each series: count, mean, standard deviation, min/max, control limits, and process capability (Cp, Cpk, Pp, Ppk)
 
 ![SPC Chart dashboard showing all chart types](https://raw.githubusercontent.com/KensoBI/spc-chart/refs/heads/main/src/img/numeric-x-table.png)
 
@@ -35,6 +36,13 @@ Control charts are the foundation of statistical process control. They separate 
 | Threshold visualization | Display alert thresholds alongside SPC control limits |
 | Dashboard variables | Control subgroup size across multiple panels with a single `subgroupSize` variable |
 | Feature queries | Exclude reference queries from SPC calculations |
+| Statistics table | Optional summary table with per-series stats and process capability |
+
+## Statistics Table
+
+Turn on **Show statistics table** in the panel options to display a summary table below the chart. For each series it shows the count, mean, standard deviation, min and max of your measurements, the control limits (LCL/UCL), and — when both a Lower and Upper Specification Limit are set — the process capability indices Cp, Cpk, Pp, and Ppk.
+
+You choose which columns appear, and columns that don't apply are hidden automatically. To save the numbers, **right-click the panel and choose "Download CSV"**. The table is off by default, so existing dashboards are unaffected until you enable it.
 
 ## Use Cases
 

@@ -14,7 +14,7 @@ Control charts are the foundation of statistical process control. They separate 
 - **Multiple chart types** — XmR for individual measurements, Xbar-R for small subgroups, Xbar-S for larger subgroups
 - **Custom control lines** — add Nominal, LSL, USL, or any custom reference line with static values or dynamic series lookup
 - **Fill regions** — visually highlight zones between control lines to show acceptable process ranges
-
+- **Statistics table** — an optional table below the chart summarizing each series: count, mean, standard deviation, min/max, control limits, and process capability
 
 ![SPC Chart dashboard showing all chart types](src/img/numeric-x-table.png)
 
@@ -43,6 +43,20 @@ SPC Chart is built using Grafana's native visualization components. This means i
 | Threshold visualization | Display alert thresholds alongside SPC control limits |
 | Dashboard variables | Control subgroup size across multiple panels with a single `subgroupSize` variable |
 | Feature queries | Exclude reference queries from SPC calculations |
+| Statistics table | Optional summary table with per-series stats and process capability (Cp, Cpk, Pp, Ppk) |
+| CSV export | Right-click the panel to download the statistics and control line values as a CSV file |
+
+## Statistics Table
+
+Turn on **Show statistics table** in the panel options to display a summary table below the chart. It shows, for each series:
+
+- **Count, Mean, Standard Deviation, Min, and Max** of your measurements
+- **LCL and UCL** — the control limits from the chart
+- **Cp, Cpk, Pp, and Ppk** — process capability indices, calculated when you have both a Lower and Upper Specification Limit (LSL/USL). These tell you how well your process fits within specification.
+
+You choose which columns to show, and columns that don't apply (for example capability indices when no specification limits are set) are hidden automatically. To save the numbers, **right-click the panel and choose "Download CSV"** — this exports the statistics along with the control line values.
+
+The table is turned off by default, so existing dashboards are unaffected until you enable it.
 
 ## Use Cases
 

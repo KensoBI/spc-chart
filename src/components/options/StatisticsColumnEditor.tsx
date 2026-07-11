@@ -3,20 +3,7 @@ import { css } from '@emotion/css';
 import { GrafanaTheme2, StandardEditorProps } from '@grafana/data';
 import { Icon, MultiSelect, Stack, Tooltip, useStyles2 } from '@grafana/ui';
 import { Options } from 'panelcfg';
-
-const COLUMN_OPTIONS = [
-  { label: 'n', value: 'n' },
-  { label: 'Mean', value: 'mean' },
-  { label: 'Std Dev', value: 'stdDev' },
-  { label: 'Min', value: 'min' },
-  { label: 'Max', value: 'max' },
-  { label: 'LCL', value: 'lcl' },
-  { label: 'UCL', value: 'ucl' },
-  { label: 'Cp', value: 'cp' },
-  { label: 'Cpk', value: 'cpk' },
-  { label: 'Pp', value: 'pp' },
-  { label: 'Ppk', value: 'ppk' },
-];
+import { listStatisticsColumns } from 'registry/statisticsColumns';
 
 const tooltipContent = (
   <div>
@@ -39,11 +26,12 @@ const getStyles = (theme: GrafanaTheme2) => ({
 
 export const StatisticsColumnEditor = ({ value, onChange }: StandardEditorProps<string[], any, Options>) => {
   const styles = useStyles2(getStyles);
+  const columnOptions = listStatisticsColumns().map((col) => ({ label: col.header, value: col.id }));
 
   return (
     <Stack direction="row" alignItems="center" gap={1}>
       <MultiSelect
-        options={COLUMN_OPTIONS}
+        options={columnOptions}
         value={value ?? []}
         onChange={(selected) => onChange(selected.map((s) => s.value!))}
       />

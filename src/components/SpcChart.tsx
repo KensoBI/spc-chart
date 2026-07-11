@@ -212,7 +212,10 @@ export const SpcChartPanel = ({
   const handleExport = useCallback(() => {
     const statistics = calculateSeriesStatistics(samples, optionsWithVars, samplesWithCalcs, rawSamples);
     const controlLines = resolveControlLines(samplesWithCalcs, optionsWithVars);
-    const csv = buildExportCsv(statistics, controlLines, optionsWithVars.statisticsTableColumns);
+    const csv = buildExportCsv(statistics, controlLines, optionsWithVars.statisticsTableColumns, {
+      options: optionsWithVars,
+      frames: samplesWithCalcs,
+    });
     downloadCsv(csv, generateExportFilename());
   }, [samples, optionsWithVars, samplesWithCalcs, rawSamples]);
 

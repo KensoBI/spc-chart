@@ -10,10 +10,10 @@ function validNumbers(field: Field): number[] {
   return field.values.filter((value: unknown): value is number => typeof value === 'number' && !Number.isNaN(value));
 }
 
-// XmR charts have a fixed subgroup of 1 but historically ignored the panel's
-// subgroup size, so they accept any value; the Xbar family is only defined for
-// sizes 2-25 (the range covered by the A2/A3/B3/B4/D3/D4 constants).
-const anySubgroupSize = { min: 1, max: Number.POSITIVE_INFINITY };
+// XmR charts operate on individual observations (subgroup of 1); the Xbar
+// family is only defined for sizes 2-25 (the range covered by the
+// A2/A3/B3/B4/D3/D4 constants).
+const individualsSubgroupSize = { min: 1, max: 1 };
 const tabulatedSubgroupSizes = { min: 2, max: 25 };
 
 export const builtinChartTypes: ChartTypeDefinition[] = [
@@ -21,14 +21,14 @@ export const builtinChartTypes: ChartTypeDefinition[] = [
     id: SpcChartTyp.x_XmR,
     label: 'X chart (XmR)',
     family: 'variables',
-    subgroupSize: anySubgroupSize,
+    subgroupSize: individualsSubgroupSize,
     compute: (field) => createXChartXmR(validNumbers(field)),
   },
   {
     id: SpcChartTyp.mR_XmR,
     label: 'mR chart (XmR)',
     family: 'variables',
-    subgroupSize: anySubgroupSize,
+    subgroupSize: individualsSubgroupSize,
     compute: (field) => createMRChartXmR(validNumbers(field)),
   },
   {

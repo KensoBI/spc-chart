@@ -28,6 +28,12 @@ export interface ChartTypeDefinition {
   subgroupSize: { min: number; max: number };
   /** Transform raw observations into the plotted series and control limits. */
   compute: (field: Field, ctx: SpcCalcContext) => ControlChartData | null;
+  /**
+   * Within-subgroup sigma estimate over the raw observations, used for Cp/Cpk.
+   * When absent, capability falls back to the standard estimators in
+   * calcs/capability (Rbar/d2, sbar/c4, moving range).
+   */
+  estimateSigmaWithin?: (values: number[], ctx: SpcCalcContext) => number | null;
 }
 
 const registry = new Map<string, ChartTypeDefinition>();

@@ -36,7 +36,7 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   const defaultLineColor = theme.visualization.getColorByName('dark-green');
   const chartType = context.options.chartType ? context.options.chartType : SpcChartTyp.none;
   const [expandedHandles, setExpandedHandles] = useState<number[]>([]);
-  const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp>(chartType);
+  const [selectedChartType, setSelectedChartType] = useState<SpcChartTyp | string>(chartType);
 
   if (chartType !== selectedChartType) {
     //selected chart type option was changed

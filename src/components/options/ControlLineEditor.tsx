@@ -230,7 +230,9 @@ export const ControlLineEditor = ({ item, value, onChange, context }: StandardEd
   }
 
   function getControlLineDisplayName(controlLine: ControlLine): React.JSX.Element {
-    const seriesData = getFilteredDataFrames();
+    // Resolve against the same frame array the seriesIndex was assigned from:
+    // computed lines index data-only frames, non-computed lines the full array.
+    const seriesData = getFilteredDataFramesForReducer(controlLine.reducerId);
 
     if (seriesData && seriesData.length > 1 && seriesData[controlLine.seriesIndex]) {
       return (

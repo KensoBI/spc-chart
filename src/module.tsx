@@ -2,7 +2,8 @@ import { PanelPlugin } from '@grafana/data';
 import { commonOptionsBuilder, TooltipDisplayMode } from '@grafana/ui';
 
 import { defaultGraphConfig, getGraphFieldConfig } from './config';
-import { FieldConfig, Options } from './panelcfg';
+import { defaultStatisticsTableColumns, FieldConfig, Options } from './panelcfg';
+import { StatisticsColumnEditor } from 'components/options/StatisticsColumnEditor';
 import { SpcChartTyp } from 'types';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
@@ -66,6 +67,25 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       editor: ControlLineEditor,
       defaultValue: [],
       category: ['SPC'],
+    });
+
+    builder.addBooleanSwitch({
+      path: 'showStatisticsTable',
+      name: 'Show statistics table',
+      description: 'Display a table with SPC statistics below the chart',
+      defaultValue: false,
+      category: ['Statistics Table'],
+    });
+
+    builder.addCustomEditor({
+      id: 'statisticsTableColumns',
+      path: 'statisticsTableColumns',
+      name: 'Visible columns',
+      description: 'Choose which columns to display in the statistics table',
+      editor: StatisticsColumnEditor,
+      defaultValue: defaultStatisticsTableColumns,
+      showIf: (option) => option.showStatisticsTable === true,
+      category: ['Statistics Table'],
     });
 
     commonOptionsBuilder.addTooltipOptions(builder, false, false, {

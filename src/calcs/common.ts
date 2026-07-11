@@ -9,6 +9,9 @@ export function chunkArray(array: number[], size: number): number[][] {
 }
 
 export function calculateSampleStandardDeviation(subgroup: number[]): number {
+  if (subgroup.length < 2) {
+    return NaN;
+  }
   const mean = subgroup.reduce((sum, value) => sum + value, 0) / subgroup.length;
   const squaredDifferences = subgroup.map((value) => Math.pow(value - mean, 2));
   const stdDev = Math.sqrt(squaredDifferences.reduce((sum, value) => sum + value, 0) / (subgroup.length - 1));

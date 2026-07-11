@@ -1,0 +1,1356 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "adr7r9h",
+    "namespace": "default",
+    "uid": "12b31aa8-c92c-41b5-bdbd-c81620459ff6",
+    "resourceVersion": "1783732620851983",
+    "generation": 1,
+    "creationTimestamp": "2026-07-11T01:17:00Z",
+    "labels": {
+      "grafana.app/deprecatedInternalID": "4095316394672128"
+    },
+    "annotations": {
+      "grafana.app/createdBy": "user:bfrqmpu2fiebkd",
+      "grafana.app/folder": "",
+      "grafana.app/saved-from-ui": "Grafana v13.0.1+security-01 (9bbe672d)"
+    }
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "query": {
+            "kind": "DataQuery",
+            "group": "grafana",
+            "version": "v0",
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "spec": {}
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "builtIn": true
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "id": 1,
+          "title": "mR chart (XmR)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "grafana"
+                      },
+                      "spec": {
+                        "queryType": "randomWalk"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "mR-XmR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "id": 2,
+          "title": "X-chart (Xbar-R)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "grafana"
+                      },
+                      "spec": {
+                        "queryType": "randomWalk"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "grafana"
+                      },
+                      "spec": {
+                        "queryType": "randomWalk"
+                      }
+                    },
+                    "refId": "B",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XbarR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 1
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 1
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 1
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 5,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "id": 3,
+          "title": "X-chart (Xbar-R)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "",
+                      "version": "v0",
+                      "spec": {}
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XbarR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "id": 4,
+          "title": "R Chart (Xbar-R)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "",
+                      "version": "v0",
+                      "spec": {}
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "R-XbarR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "id": 5,
+          "title": "X chart (Xbar-S)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "",
+                      "version": "v0",
+                      "spec": {}
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XbarS",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 5,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "id": 6,
+          "title": "S Chart (Xbar-S)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "",
+                      "version": "v0",
+                      "spec": {}
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "S-XbarS",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 5,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "id": 7,
+          "title": "X-chart (XmR)",
+          "description": "",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "",
+                      "version": "v0",
+                      "spec": {}
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "kensobi-spc-panel",
+            "version": "2.3.0",
+            "spec": {
+              "options": {
+                "aggregationType": "none",
+                "chartType": "X-XmR",
+                "controlLines": [
+                  {
+                    "field": "",
+                    "fillDirection": 0,
+                    "fillOpacity": 10,
+                    "lineColor": "#1F60C4",
+                    "lineWidth": 2,
+                    "name": "Mean",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "mean",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": -1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "LCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "lcl",
+                    "seriesIndex": 0
+                  },
+                  {
+                    "field": "",
+                    "fillDirection": 1,
+                    "fillOpacity": 10,
+                    "lineColor": "#F2495C",
+                    "lineWidth": 2,
+                    "name": "UCL",
+                    "position": 0,
+                    "positionInput": "Static",
+                    "reducerId": "ucl",
+                    "seriesIndex": 0
+                  }
+                ],
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "showStatisticsTable": true,
+                "statisticsTableColumns": [
+                  "n",
+                  "mean",
+                  "stdDev",
+                  "min",
+                  "max",
+                  "lcl",
+                  "ucl",
+                  "cp",
+                  "cpk",
+                  "pp",
+                  "ppk"
+                ],
+                "subgroupSize": 1,
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      },
+                      {
+                        "value": 80,
+                        "color": "red"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 12,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-7"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 12,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 12,
+              "width": 12,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-3"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 12,
+              "width": 12,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-4"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 23,
+              "width": 12,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-5"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 12,
+              "y": 23,
+              "width": 12,
+              "height": 11,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
+              }
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "x": 0,
+              "y": 34,
+              "width": 12,
+              "height": 10,
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [],
+    "timeSettings": {
+      "timezone": "browser",
+      "from": "2024-10-01T22:04:30.000Z",
+      "to": "2024-10-03T00:44:30.000Z",
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "hideTimepicker": false,
+      "fiscalYearStartMonth": 0
+    },
+    "title": "SPC Charts v2 - table",
+    "variables": []
+  }
+}

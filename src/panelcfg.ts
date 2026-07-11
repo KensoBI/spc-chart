@@ -14,13 +14,29 @@ export interface Options extends common.OptionsWithTimezones {
   onSeriesColorChange: (label: string, color: string) => void;
   /** Field name for numeric X-axis. When set, uses numeric X instead of time. */
   xField?: string;
+  showStatisticsTable?: boolean;
+  statisticsTableColumns?: string[];
 }
+
+export const defaultStatisticsTableColumns = [
+  'n',
+  'mean',
+  'stdDev',
+  'min',
+  'max',
+  'lcl',
+  'ucl',
+  'cp',
+  'cpk',
+  'pp',
+  'ppk',
+];
 
 export interface FieldConfig extends common.GraphFieldConfig {}
 
 export interface ControlLine {
   name: string;
-  position: number;
+  position?: number;
   field: string;
   positionInput: PositionInput;
   seriesIndex: number;

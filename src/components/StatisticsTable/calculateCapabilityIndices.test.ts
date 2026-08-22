@@ -427,3 +427,144 @@ describe('calculateSeriesStatistics — multiple value fields in one frame (wide
     expect(stats[1].ucl).toBe(52);
   });
 });
+
+describe('calculateSeriesStatistics — multiple frames sharing one refId', () => {
+  // A single query (one refId) can return several frames — e.g. Prometheus/Loki one frame per
+  // label set, or a "Partition by values" transform. Every frame keeps the query's refId, so refId
+  // is NOT a unique frame key. Each frame must yield its OWN statistics, never the first frame's.
+  // Both series have unit moving ranges (sigma-within = SIGMA_WITHIN) so Cp depends only on the
+  // spec tolerance — that isolates which frame's limits were picked.
+  const A_VALUES = [1, 2, 3, 4, 5]; // mean 3
+  const B_VALUES = [10, 11, 12, 13, 14]; // mean 12
+  const meanOf = (xs: number[]) => xs.reduce((s, v) => s + v, 0) / xs.length;
+
+  // Two plotted frames that share refId 'A' (only the label differs).
+  const makePlotted = (name: string, values: number[]) =>
+    toDataFrame({
+      refId: 'A',
+      name,
+      fields: [
+        { name: 'time', type: FieldType.time, values: [1, 2, 3, 4, 5] },
+        { name: 'value', type: FieldType.number, values },
+      ],
+    });
+
+  const options = {
+    chartType: SpcChartTyp.x_XmR,
+    subgroupSize: 1,
+    aggregationType: AggregationType.none,
+    controlLines: [],
+    curves: [],
+    featureQueryRefIds: [],
+  } as unknown as Options;
+
+  it('gives each same-refId frame its own raw statistics (not the first frame\'s)', () => {
+    const plottedA = makePlotted('series=a', A_VALUES);
+    const plottedB = makePlotted('series=b', B_VALUES);
+    const series = [plottedA, plottedB];
+
+    // rawSeries holds CLONES: same refId and values, different object identity — this mirrors the
+    // real pipeline where doSpcCalcs rebuilds every frame, so the plotted frames never match the raw
+    // frames by identity and a naive find(by refId) would resolve BOTH to the first raw frame.
+    const rawSeries = [makePlotted('series=a', A_VALUES), makePlotted('series=b', B_VALUES)];
+
+    const stats = calculateSeriesStatistics(series, options, series, rawSeries);
+
+    expect(stats).toHaveLength(2);
+    // Before the fix, stats[1] borrowed the first frame's raw data → mean 3 instead of 14.
+    expect(stats[0].mean).toBeCloseTo(meanOf(A_VALUES), 10);
+    expect(stats[0].min).toBe(1);
+    expect(stats[0].max).toBe(5);
+    expect(stats[1].mean).toBeCloseTo(meanOf(B_VALUES), 10);
+    expect(stats[1].min).toBe(10);
+    expect(stats[1].max).toBe(14);
+  });
+
+  it('resolves per-series spec limits by position when the full array holds same-refId clones', () => {
+    // Two data frames sharing refId 'A', each with its OWN spec-limit control line addressed by the
+    // frame's index in the full array. If both frames collapsed onto the first slot (naive refId
+    // findIndex), the second series would pick up the first series' limits.
+    const plottedA = makePlotted('series=a', A_VALUES); // mean 3
+    const plottedB = makePlotted('series=b', B_VALUES); // mean 12
+    const series = [plottedA, plottedB];
+
+    // allSeries is a cloned full array (same refIds, different identity) so identity lookup fails and
+    // the mapping must fall back to an in-order refId walk — each frame claiming its own slot.
+    const allSeries = [makePlotted('series=a', A_VALUES), makePlotted('series=b', B_VALUES)];
+
+    const controlLines: ControlLine[] = [
+      makeControlLine({ name: 'LSL0', reducerId: ControlLineReducerId.lsl, position: 0, seriesIndex: 0 }),
+      makeControlLine({ name: 'USL0', reducerId: ControlLineReducerId.usl, position: 6, seriesIndex: 0 }),
+      makeControlLine({ name: 'LSL1', reducerId: ControlLineReducerId.lsl, position: 8, seriesIndex: 1 }),
+      makeControlLine({ name: 'USL1', reducerId: ControlLineReducerId.usl, position: 20, seriesIndex: 1 }),
+    ];
+    const opts = makeOptions(controlLines);
+
+    const stats = calculateSeriesStatistics(series, opts, allSeries, series);
+
+    // Series 0 uses [0, 6] → tolerance 6. Series 1 uses [8, 20] → tolerance 12. Both share
+    // sigma-within, so Cp of series 1 is exactly double series 0.
+    expect(stats).toHaveLength(2);
+    expect(stats[0].cp).toBeCloseTo(6 / (6 * SIGMA_WITHIN), 4);
+    // Series 1 must NOT reuse series 0's tolerance of 6 (the naive-refId bug); its own is 12.
+    expect(stats[1].cp).toBeCloseTo(12 / (6 * SIGMA_WITHIN), 4);
+  });
+});
+
+describe('calculateSeriesStatistics — excluded points', () => {
+  // Same Xbar-R fixture as the Minitab-style report: raw [1,5] [3,7] [2,8],
+  // plotted subgroup means [3, 5, 5] at aggregated times [1.5, 3.5, 5.5].
+  const rawFrame = toDataFrame({
+    refId: 'B',
+    fields: [
+      { name: 'time', type: FieldType.time, values: [1, 2, 3, 4, 5, 6] },
+      { name: 'value', type: FieldType.number, values: [1, 5, 3, 7, 2, 8] },
+    ],
+  });
+  const plottedFrame = toDataFrame({
+    refId: 'B',
+    fields: [
+      { name: 'time', type: FieldType.time, values: [1.5, 3.5, 5.5] },
+      { name: 'value', type: FieldType.number, values: [3, 5, 5] },
+    ],
+  });
+  plottedFrame.fields[1].state = { calcs: { lcl: -4.44, ucl: 13.1067, mean: 13 / 3 } };
+
+  it('drops the excluded subgroup from the raw-observation statistics', () => {
+    const options = {
+      chartType: SpcChartTyp.x_XbarR,
+      subgroupSize: 2,
+      aggregationType: AggregationType.none,
+      controlLines: [],
+      curves: [],
+      featureQueryRefIds: [],
+      // Middle subgroup (raw rows at times 3 and 4) plots at x = 3.5.
+      chartOptions: { excludedPoints: [{ series: 'value', x: 3.5 }] },
+    } as unknown as Options;
+
+    const stats = calculateSeriesStatistics([plottedFrame], options, [plottedFrame], [rawFrame]);
+
+    // Remaining raw observations: [1, 5, 2, 8]
+    expect(stats[0].n).toBe(4);
+    expect(stats[0].mean).toBeCloseTo(4, 10);
+    expect(stats[0].min).toBe(1);
+    expect(stats[0].max).toBe(8);
+  });
+
+  it('ignores exclusions recorded for other series', () => {
+    const options = {
+      chartType: SpcChartTyp.x_XbarR,
+      subgroupSize: 2,
+      aggregationType: AggregationType.none,
+      controlLines: [],
+      curves: [],
+      featureQueryRefIds: [],
+      chartOptions: { excludedPoints: [{ series: 'other', x: 3.5 }] },
+    } as unknown as Options;
+
+    const stats = calculateSeriesStatistics([plottedFrame], options, [plottedFrame], [rawFrame]);
+
+    expect(stats[0].n).toBe(6);
+    expect(stats[0].mean).toBeCloseTo(26 / 6, 10);
+  });
+});

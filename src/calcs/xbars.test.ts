@@ -80,3 +80,27 @@ describe('createSChartForXbarS', () => {
     expect(createSChartForXbarS([], 2)).toBeNull();
   });
 });
+
+describe('estimation options', () => {
+  const auto = { method: 'sbar' as const, unbias: true, isDefault: true };
+
+  it('leaves the classic limits untouched on the default estimator', () => {
+    expect(createXbarChartForXbarS(DATA, 2, auto)).toEqual(createXbarChartForXbarS(DATA, 2));
+    expect(createSChartForXbarS(DATA, 2, auto)).toEqual(createSChartForXbarS(DATA, 2));
+  });
+
+  it('widens the limits when the unbiasing constant is switched off', () => {
+    // Without c4 the sigma estimate is smaller, so the limits tighten.
+    const unbiased = createXbarChartForXbarS(DATA, 2, { method: 'sbar', unbias: true, isDefault: false })!;
+    const biased = createXbarChartForXbarS(DATA, 2, { method: 'sbar', unbias: false, isDefault: false })!;
+
+    expect(biased.upperControlLimit).toBeLessThan(unbiased.upperControlLimit);
+  });
+
+  it('centers the S chart on c₄σ for a historical sigma', () => {
+    const chart = createSChartForXbarS(DATA, 2, { method: 'sbar', unbias: true, sigma: 2, isDefault: false })!;
+
+    expect(chart.centerLine).toBeCloseTo(0.7979 * 2, 10);
+    expect(chart.lowerControlLimit).toBe(0);
+  });
+});

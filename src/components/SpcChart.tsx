@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { PanelProps, DashboardCursorSync, FieldMatcherID, fieldMatchers, DataFrame } from '@grafana/data';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PanelProps, DashboardCursorSync, EventBus, FieldMatcherID, fieldMatchers, DataFrame } from '@grafana/data';
 import { config, PanelDataErrorView, locationService } from '@grafana/runtime';
 import {
   ContextMenu,
@@ -15,7 +15,9 @@ import {
   ZoomPlugin,
 } from '@grafana/ui';
 
-import { useSubgroupSizeOptions } from 'components/options/useSubgroupSize';
+import { useSubgroupSizeOptions, validateSubgroupSize } from 'components/options/useSubgroupSize';
+import { getExcludedPoints } from 'data/exclusions';
+import { getStages } from 'data/stages';
 import { doSpcCalcs } from 'data/doSpcCalcs';
 import {
   buildControlLineFrame,
@@ -31,7 +33,8 @@ import { preparePlotFrame, XYFieldMatchers } from 'utils/preparePlotFrame';
 import { StatisticsTable } from 'components/StatisticsTable/StatisticsTable';
 import { calculateSeriesStatistics } from 'components/StatisticsTable/calculateCapabilityIndices';
 import { buildExportCsv, downloadCsv, generateExportFilename, resolveControlLines } from 'utils/exportCsv';
-import { SpcChartExtensions } from 'components/extensions';
+import { SpcChartExtensions, SpcMenuPoint } from 'components/extensions';
+import { PanelLocalEventBus } from 'utils/panelLocalEventBus';
 
 interface SpcChartPanelProps extends PanelProps<Options> {
   /** Optional extension seams; see SpcChartExtensions. A wrapper panel supplies these. */
@@ -51,9 +54,37 @@ export const SpcChartPanel = ({
   onChangeTimeRange,
   extensions,
 }: SpcChartPanelProps) => {
-  const { sync, eventBus } = usePanelContext();
+  const { sync, eventBus: panelEventBus } = usePanelContext();
+
+  // See PanelLocalEventBus: the deprecated GraphNG we render still reacts to the panel's
+  // own hover/clear events, which loops against EventBusPlugin and makes the tooltip blink.
+  const eventBus = useMemo(() => new PanelLocalEventBus(panelEventBus), [panelEventBus]);
 
   const optionsWithVars = useSubgroupSizeOptions(options).options;
+
+  // Point exclusions and stages are keyed by the plotted X value, which for a
+  // subgrouped chart is the subgroup's aggregated X. Changing the effective
+  // subgroup size — via the Subgroup size editor or a chart-type switch that
+  // changes it — re-groups the data, so those X keys no longer match any point:
+  // the features would silently do nothing while still cluttering their editors.
+  // Clear them when the saved subgroup size changes. This reads the saved size,
+  // not the dashboard-variable-resolved one, so a runtime variable change never
+  // wipes saved analysis (the subgroup editor is disabled in that mode anyway).
+  const savedSubgroupSize = validateSubgroupSize(options.subgroupSize, options.chartType);
+  const prevSubgroupSizeRef = useRef(savedSubgroupSize);
+  useEffect(() => {
+    if (prevSubgroupSizeRef.current === savedSubgroupSize) {
+      return;
+    }
+    prevSubgroupSizeRef.current = savedSubgroupSize;
+    if (getExcludedPoints(options).length > 0 || getStages(options).length > 0) {
+      onOptionsChange({
+        ...options,
+        chartOptions: { ...options.chartOptions, excludedPoints: [], stages: [] },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedSubgroupSize]);
 
   // Annotation creation modal state
   const [annotationModal, setAnnotationModal] = useState<{
@@ -245,11 +276,15 @@ export const SpcChartPanel = ({
     return () => ro.disconnect();
   }, [primaryProps.ref, showTable]);
 
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; point: SpcMenuPoint | null } | null>(null);
+
+  // Last point the tooltip focused; a right-click snapshots it so menu
+  // extensions can act on the point (see SpcMenuContext.point).
+  const hoveredPointRef = useRef<SpcMenuPoint | null>(null);
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    setContextMenu({ x: e.clientX, y: e.clientY });
+    setContextMenu({ x: e.clientX, y: e.clientY, point: hoveredPointRef.current });
   }, []);
 
   if (!frames || frames.length === 0) {
@@ -266,7 +301,7 @@ export const SpcChartPanel = ({
   }
 
   return (
-    <SeriesColorContextProvider onSeriesColorChange={onSeriesColorChanged}>
+    <SeriesColorContextProvider onSeriesColorChange={onSeriesColorChanged} eventBus={eventBus}>
       <div {...containerProps} style={{ height, width }} onContextMenu={handleContextMenu}>
         {contextMenu && (
           <ContextMenu
@@ -276,7 +311,12 @@ export const SpcChartPanel = ({
             renderMenuItems={() => (
               <>
                 <MenuItem label="Download CSV" icon="download-alt" onClick={handleExport} />
-                {extensions?.contextMenuItems?.({ options: optionsWithVars, frames, onOptionsChange })}
+                {extensions?.contextMenuItems?.({
+                  options: optionsWithVars,
+                  frames,
+                  onOptionsChange,
+                  point: contextMenu.point,
+                })}
               </>
             )}
           />
@@ -337,6 +377,14 @@ export const SpcChartPanel = ({
                       // seriesIdxs[0] is null (time field), so find the first non-null series index
                       const focusedPointIdx = seriesIdxs?.find((idx, i) => i > 0 && idx != null) ?? null;
 
+                      // Remember the hovered point so a right-click can act on it.
+                      const hoveredX = focusedPointIdx != null ? alignedFrame.fields[0]?.values[focusedPointIdx] : null;
+                      const hoveredField = closestSeriesIdx != null ? alignedFrame.fields[closestSeriesIdx] : undefined;
+                      hoveredPointRef.current =
+                        focusedPointIdx != null && hoveredField && typeof hoveredX === 'number'
+                          ? { seriesName: hoveredField.name, x: hoveredX, dataIdx: focusedPointIdx }
+                          : null;
+
                       if (focusedPointIdx === null) {
                         return null;
                       }
@@ -351,6 +399,8 @@ export const SpcChartPanel = ({
                           onAddAnnotation={useNumericX ? undefined : handleAddAnnotation}
                           isPinned={isPinned}
                           onDismiss={dismiss}
+                          options={optionsWithVars}
+                          onOptionsChange={onOptionsChange}
                         />
                       );
                     }}
@@ -400,7 +450,8 @@ export const SpcChartPanel = ({
 function SeriesColorContextProvider({
   children,
   onSeriesColorChange,
-}: React.PropsWithChildren<{ onSeriesColorChange: (label: string, color: string) => void }>) {
+  eventBus,
+}: React.PropsWithChildren<{ onSeriesColorChange: (label: string, color: string) => void; eventBus: EventBus }>) {
   const originalContext = usePanelContext();
 
   // calls both our custom implementation as well as and original function
@@ -421,8 +472,11 @@ function SeriesColorContextProvider({
     () => ({
       ...originalContext,
       onSeriesColorChange: customOnSeriesColorChange,
+      // GraphNG reads the bus off the panel context, so the self-filtering wrapper has to
+      // be installed here too — not only on the EventBusPlugin we render ourselves.
+      eventBus,
     }),
-    [customOnSeriesColorChange, originalContext]
+    [customOnSeriesColorChange, originalContext, eventBus]
   );
 
   return <PanelContextProvider value={customContext}>{children}</PanelContextProvider>;

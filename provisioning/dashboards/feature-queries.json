@@ -1,0 +1,371 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Fixture for the Feature queries panel option (issue #65). Three queries: A = measurements, B and C = reference series carrying the spec limits. The two panels are identical except for featureQueryRefIds - left leaves it empty, right declares B and C as feature queries. Only the right panel's statistics table describes the process alone.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Feature queries\n\nA panel often mixes two kinds of query: the **measurements** you are charting, and **reference queries** that only supply values to draw against (spec limits, a nominal target, limits looked up from a database). Reference series are still real time series, so by default the panel treats them as process data: they get their own row in the statistics table, with a meaningless Mean, Std Dev and Cp/Cpk.\n\nThe **Feature queries** option (panel editor → **SPC** section) marks queries as reference-only. Declared refIds are dropped from the statistics table, from the CSV export, and from the series numbering that computed control lines (Mean/LCL/UCL/±σ) index into. They are still drawn on the chart — that is the point of a reference series.\n\n> Note: a reference query that returns **no time field** (a plain lookup table such as `name,lsl,usl,nominal`) is already skipped automatically, because the panel only tabulates frames it can plot. Feature queries are what you need when the reference data *is* a time series, as below.\n\n## Queries\n\n| refId | Alias | Role |\n|---|---|---|\n| A | `Bore diameter` | 24 measurements, process centred near 10.00 |\n| B | `LSL spec` | reference series, constant 9.85 |\n| C | `USL spec` | reference series, constant 10.15 |\n\n## What to verify\n\n1. **Left panel** (`Feature queries` empty): the statistics table has **three rows** — `Bore diameter`, `LSL spec`, `USL spec`. The two spec rows report a Std Dev of ~0 and no usable Cp/Cpk — they describe a constant, not a process. This is the state reported in issue #65.\n2. **Right panel** (`Feature queries` = B, C): the statistics table has **one row**, `Bore diameter`. Its n, Mean, Std Dev, Min, Max, LCL/UCL and Cp/Cpk are unchanged from the left panel — excluding the reference queries changes which rows appear, never the process numbers.\n3. **Both panels** draw the same three lines plus the same Mean/LCL/UCL control lines: the reference series stay visible.\n4. Open the right panel's editor: **SPC → Feature queries** is a multi-select listing A, B, C. Before the fix this option did not exist in the UI at all.\n5. Right-click each panel → **Download CSV**: the left export contains the two spec series, the right one does not.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "2.4.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 12,
+        "x": 0,
+        "y": 7
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#37872D",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "LSL spec",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "USL spec",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 2
+          }
+        ],
+        "featureQueryRefIds": [],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "lcl",
+          "ucl",
+          "cp",
+          "cpk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.4.0",
+      "targets": [
+        {
+          "alias": "Bore diameter",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.02,9.96,10.08,9.99,10.05,9.93,10.11,10.01,9.97,10.06,9.94,10.03,10.09,9.98,10.04,9.92,10.07,10,9.95,10.1,10.02,9.99,10.06,9.97"
+        },
+        {
+          "alias": "LSL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "B",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85"
+        },
+        {
+          "alias": "USL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "C",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
+        }
+      ],
+      "title": "Feature queries NOT set — spec series pollute the statistics table",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 12,
+        "x": 12,
+        "y": 7
+      },
+      "id": 2,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#37872D",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "LSL spec",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "USL spec",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 2
+          }
+        ],
+        "featureQueryRefIds": ["B", "C"],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "lcl",
+          "ucl",
+          "cp",
+          "cpk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.4.0",
+      "targets": [
+        {
+          "alias": "Bore diameter",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.02,9.96,10.08,9.99,10.05,9.93,10.11,10.01,9.97,10.06,9.94,10.03,10.09,9.98,10.04,9.92,10.07,10,9.95,10.1,10.02,9.99,10.06,9.97"
+        },
+        {
+          "alias": "LSL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "B",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85"
+        },
+        {
+          "alias": "USL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "C",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
+        }
+      ],
+      "title": "Feature queries = B, C — statistics describe the process only",
+      "type": "kensobi-spc-panel"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 40,
+  "tags": ["spc", "regression", "feature-queries"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Feature queries (issue #65)",
+  "uid": "spc-feature-queries",
+  "version": 1,
+  "weekStart": ""
+}

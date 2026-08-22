@@ -1,0 +1,173 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Regression fixture for the fix where a single query (refId A) returns several frames. One TestData query emits three frames that all share refId A but carry different values under label sets line=A/B/C - the same shape a Prometheus query with several label sets produces. Each row of the statistics table must show its own n, Mean, Std Dev, Min, Max and Cp/Cpk/Pp/Ppk. Before the fix every row copied frame 0.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Multiple frames sharing one refId\n\nA Grafana **refId identifies the query, not a frame**. One query can return several frames that share a refId but hold different measurements (a Prometheus query with several label sets, or a datasource that splits series by timestamp).\n\nThe single query below returns **three frames, all `refId: A`**, under label sets `line=A`, `line=B`, `line=C`, centred near **12**, **50** and **95**. A `sample` index column drives the numeric X-axis so every frame is plotted. Spec limits are LSL = 0, USL = 120.\n\n**What to verify:** the statistics table shows **three distinct rows**, each with its own n, Mean, Std Dev, Min, Max and Cp/Cpk/Pp/Ppk matching its own frame (Min/Max around 10-14, 48-53, 85-110 respectively).\n\n**Before the fix** the raw-statistics and spec-limit lookups matched frames by refId and took the first match, so all three rows displayed **frame 0's** numbers (Min 10 / Max 14 everywhere). **After the fix** frames are matched by position, so each row reflects its own frame.",
+        "mode": "markdown"
+      },
+      "pluginVersion": "2.3.0",
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 1,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "none",
+        "controlLines": [
+          {
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "static",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 4,
+            "name": "USL",
+            "position": 120,
+            "positionInput": "static",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "cp",
+          "cpk",
+          "pp",
+          "ppk"
+        ],
+        "subgroupSize": 1,
+        "xField": "sample"
+      },
+      "pluginVersion": "2.3.0",
+      "targets": [
+        {
+          "csvContent": "line,sample,value\nA,1,10\nA,2,12\nA,3,11\nA,4,13\nA,5,12\nA,6,14\nA,7,11\nA,8,10\nA,9,13\nA,10,12\nB,1,48\nB,2,52\nB,3,50\nB,4,53\nB,5,49\nB,6,51\nB,7,50\nB,8,52\nB,9,48\nB,10,50\nC,1,90\nC,2,95\nC,3,88\nC,4,92\nC,5,110\nC,6,85\nC,7,105\nC,8,93\nC,9,97\nC,10,100\n",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "One query (refId A) -> 3 frames: each row must be distinct",
+      "transformations": [
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "line"
+            ],
+            "keepFields": false,
+            "naming": {
+              "asLabels": true
+            }
+          }
+        }
+      ],
+      "type": "kensobi-spc-panel"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 40,
+  "tags": [
+    "spc",
+    "regression",
+    "multi-frame-refid"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Multiple frames per refId (fix verification)",
+  "uid": "spc-multiframe-refid",
+  "version": 1,
+  "weekStart": ""
+}

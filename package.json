@@ -1,6 +1,6 @@
 {
   "name": "kensobi-spc-panel",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Create common SPC charts like Xbar-R, XbarS, and XmR charts.",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
@@ -9,8 +9,8 @@
     "test:ci": "jest --passWithNoTests --maxWorkers 4",
     "typecheck": "tsc --noEmit",
     "audit:osv": "node ./scripts/osv-scan.mjs",
-    "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint": "eslint --cache .",
+    "lint:fix": "yarn lint --fix && prettier --write --list-different .",
     "e2e": "npm exec cypress install && npm exec grafana-e2e run",
     "e2e:update": "npm exec cypress install && npm exec grafana-e2e run --update-screenshots",
     "server": "docker-compose up --build",
@@ -95,9 +95,13 @@
     "flatted": "3.4.2",
     "protobufjs": "^7.6.1",
     "@remix-run/router": "^1.23.2",
-    "fast-uri": "^3.1.2",
+    "fast-uri": "^3.1.5",
     "immutable": "^5.1.5",
     "js-cookie": "^3.0.7",
-    "lodash": "^4.18.0"
+    "lodash": "^4.18.0",
+    "websocket-driver": "^0.7.5",
+    "nanoid": "^3.3.18",
+    "postcss": "^8.5.26",
+    "js-yaml": "4.3.1"
   }
 }

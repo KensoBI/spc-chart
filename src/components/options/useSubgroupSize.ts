@@ -28,7 +28,7 @@ function useSearchParamsChange() {
   return searchParams;
 }
 
-function validateSubgroupSize(subgroupSize: number, chartType: SpcChartTyp | string): number {
+export function validateSubgroupSize(subgroupSize: number, chartType: SpcChartTyp | string): number {
   // When chartType === none, allow any positive number for subgroupSize
   if (chartType === SpcChartTyp.none) {
     return Math.max(subgroupSize, 1); // Only ensure it's greater than 0

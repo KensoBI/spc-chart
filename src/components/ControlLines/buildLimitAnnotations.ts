@@ -83,18 +83,24 @@ export function buildControlLineFrame(
       return;
     }
 
+    // Stepped lines (variable-limit charts) carry one position per point;
+    // constant lines repeat the scalar position across the x range.
+    const stepped = cl.positionData != null && cl.positionData.length > 0;
+
     const custom: GraphFieldConfig = {
-      transform: xField === null ? GraphTransform.Constant : undefined, // this will allow grafana to transform this field into a constant
+      transform: !stepped && xField === null ? GraphTransform.Constant : undefined, // this will allow grafana to transform this field into a constant
       lineWidth: cl.lineWidth,
       gradientMode: GraphGradientMode.None,
-      lineInterpolation: LineInterpolation.Smooth,
+      lineInterpolation: stepped ? LineInterpolation.StepAfter : LineInterpolation.Smooth,
       drawStyle: GraphDrawStyle.Line,
     };
 
     const constant = {
       name: cl.name,
       type: FieldType.number,
-      values: xAxisField.values.map(() => cl.position),
+      values: stepped
+        ? xAxisField.values.map((_, i) => cl.positionData![i] ?? null)
+        : xAxisField.values.map(() => cl.position),
       config: {
         custom,
         color: {
@@ -245,9 +251,14 @@ function processComputedControlLines(
     // (insufficient data yields null), drop the line instead of falling back to the editor
     // default position, which would draw a spurious line at 0.
     const computedValue = numericField.state.calcs[cl.reducerId];
+
+    // Variable-limit charts publish per-point positions under `<reducerId>Data`;
+    // carry them so the line renders stepped instead of constant.
+    const computedData = numericField.state.calcs[`${cl.reducerId}Data`];
     return {
       ...cl,
       position: computedValue ?? undefined,
+      positionData: Array.isArray(computedData) ? computedData : undefined,
     };
   });
 

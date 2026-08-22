@@ -1,22 +1,8 @@
-import { ControlChartConstants, getControlChartConstant } from 'data/calcConst';
+import { ResolvedEstimation } from 'data/estimation';
 import { SpcChartTyp } from 'types';
-import { calculateMovingRanges, calculateSampleStandardDeviation, chunkArray } from './common';
+import { estimateSigma, getC4 } from './sigma';
 
-const D2_N2 = 1.128; // d2 for n = 2 (moving ranges are always pairwise)
-
-/**
- * c4 unbiasing constant for the sample standard deviation: exact table values for
- * n = 2..25, and the standard approximation 4(n-1)/(4n-3) beyond the table.
- */
-export function getC4(n: number): number {
-  if (n < 2) {
-    return NaN;
-  }
-  if (n <= 25) {
-    return getControlChartConstant(n, ControlChartConstants.C4_xbar_sigma);
-  }
-  return (4 * n - 4) / (4 * n - 3);
-}
+export { getC4 };
 
 /**
  * Estimate the within-subgroup standard deviation of the process from the raw individual
@@ -28,39 +14,48 @@ export function getC4(n: number): number {
  * - no chart:      pooled standard deviation / c4(d+1) when data is subgrouped,
  *                  average moving range / d2(2) for individuals (subgroup size 1)
  *
+ * When the chart carries custom estimation settings, Cp/Cpk follow the same
+ * estimator as its control limits — a capability index computed from a
+ * different sigma than the chart it sits under would be indefensible.
+ *
  * Returns null when the estimate is undefined (not enough data).
  */
 export function estimateSigmaWithin(
   values: number[],
   chartType: SpcChartTyp | string,
-  subgroupSize: number
+  subgroupSize: number,
+  estimation?: ResolvedEstimation
 ): number | null {
+  if (estimation && !estimation.isDefault) {
+    return estimation.sigma ?? estimateSigma(values, subgroupSize, estimation.method, estimation.unbias);
+  }
+
   const isChartSubgroupSize = subgroupSize >= 2 && subgroupSize <= 25;
 
   switch (chartType) {
     case SpcChartTyp.x_XbarR:
     case SpcChartTyp.r_XbarR:
       if (isChartSubgroupSize) {
-        return sigmaFromRbar(values, subgroupSize);
+        return estimateSigma(values, subgroupSize, 'rbar');
       }
       break;
     case SpcChartTyp.x_XbarS:
     case SpcChartTyp.s_XbarS:
       if (isChartSubgroupSize) {
-        return sigmaFromSbar(values, subgroupSize);
+        return estimateSigma(values, subgroupSize, 'sbar');
       }
       break;
     case SpcChartTyp.x_XmR:
     case SpcChartTyp.mR_XmR:
-      return sigmaFromMovingRange(values);
+      return estimateSigma(values, 1, 'average-mr');
     default:
       break;
   }
 
   if (subgroupSize >= 2) {
-    return sigmaFromPooledStdDev(values, subgroupSize);
+    return estimateSigma(values, subgroupSize, 'pooled');
   }
-  return sigmaFromMovingRange(values);
+  return estimateSigma(values, 1, 'average-mr');
 }
 
 /**
@@ -95,52 +90,4 @@ export function calculateCapability(
   }
 
   return { cp, cpk, pp, ppk };
-}
-
-function sigmaFromRbar(values: number[], subgroupSize: number): number | null {
-  const subgroups = chunkArray(values, subgroupSize).filter((sg) => sg.length === subgroupSize);
-  if (subgroups.length === 0) {
-    return null;
-  }
-  const rBar =
-    subgroups.reduce((sum, sg) => sum + (Math.max(...sg) - Math.min(...sg)), 0) / subgroups.length;
-  const d2 = getControlChartConstant(subgroupSize, ControlChartConstants.d2_xbar_range);
-  return rBar / d2;
-}
-
-function sigmaFromSbar(values: number[], subgroupSize: number): number | null {
-  const subgroups = chunkArray(values, subgroupSize).filter((sg) => sg.length === subgroupSize);
-  if (subgroups.length === 0) {
-    return null;
-  }
-  const sBar = subgroups.reduce((sum, sg) => sum + calculateSampleStandardDeviation(sg), 0) / subgroups.length;
-  return sBar / getC4(subgroupSize);
-}
-
-function sigmaFromMovingRange(values: number[]): number | null {
-  const movingRanges = calculateMovingRanges(values);
-  if (movingRanges.length === 0) {
-    return null;
-  }
-  const mrBar = movingRanges.reduce((sum, v) => sum + v, 0) / movingRanges.length;
-  return mrBar / D2_N2;
-}
-
-function sigmaFromPooledStdDev(values: number[], subgroupSize: number): number | null {
-  // Sp = sqrt( sum((ni - 1) * si^2) / sum(ni - 1) ) over subgroups with at least two values,
-  // unbiased by c4(d + 1) where d is the pooled degrees of freedom (Minitab's default estimator).
-  const subgroups = chunkArray(values, subgroupSize).filter((sg) => sg.length >= 2);
-  if (subgroups.length === 0) {
-    return null;
-  }
-
-  let sumSquares = 0;
-  let degreesOfFreedom = 0;
-  for (const sg of subgroups) {
-    const s = calculateSampleStandardDeviation(sg);
-    sumSquares += (sg.length - 1) * s * s;
-    degreesOfFreedom += sg.length - 1;
-  }
-
-  return Math.sqrt(sumSquares / degreesOfFreedom) / getC4(degreesOfFreedom + 1);
 }

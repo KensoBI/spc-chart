@@ -43,8 +43,8 @@ SPC Chart is built using Grafana's native visualization components. This means i
 | Threshold visualization | Display alert thresholds alongside SPC control limits |
 | Dashboard variables | Control subgroup size across multiple panels with a single `subgroupSize` variable |
 | Feature queries | Exclude reference queries from SPC calculations |
-| Statistics table | Optional summary table with per-series stats and process capability (Cp, Cpk, Pp, Ppk) |
-| CSV export | Right-click the panel to download the statistics and control line values as a CSV file |
+| Statistics table | Optional summary table with per-series stats and process capability |
+
 
 ## Statistics Table
 

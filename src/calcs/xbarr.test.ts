@@ -76,3 +76,40 @@ describe('createRChartForXbarR', () => {
     expect(createRChartForXbarR([], 2)).toBeNull();
   });
 });
+
+describe('estimation options', () => {
+  const auto = { method: 'rbar' as const, unbias: true, isDefault: true };
+
+  it('leaves the classic limits untouched on the default estimator', () => {
+    expect(createXbarChartForXbarR(DATA, 2, auto)).toEqual(createXbarChartForXbarR(DATA, 2));
+    expect(createRChartForXbarR(DATA, 2, auto)).toEqual(createRChartForXbarR(DATA, 2));
+  });
+
+  it('estimates sigma with the chosen method instead of R̄/d₂', () => {
+    const rbar = createXbarChartForXbarR(DATA, 2)!;
+    const pooled = createXbarChartForXbarR(DATA, 2, { method: 'pooled', unbias: true, isDefault: false })!;
+
+    expect(pooled.centerLine).toBeCloseTo(rbar.centerLine, 10);
+    expect(pooled.upperControlLimit).not.toBeCloseTo(rbar.upperControlLimit, 6);
+  });
+
+  it('places the limits at µ ± 3σ/√n for historical parameters', () => {
+    const chart = createXbarChartForXbarR(DATA, 2, {
+      method: 'rbar',
+      unbias: true,
+      mean: 10,
+      sigma: 2,
+      isDefault: false,
+    })!;
+
+    expect(chart.centerLine).toBe(10);
+    expect(chart.upperControlLimit).toBeCloseTo(10 + (3 * 2) / Math.sqrt(2), 10);
+  });
+
+  it('drives the range chart from a historical sigma', () => {
+    const chart = createRChartForXbarR(DATA, 2, { method: 'rbar', unbias: true, sigma: 2, isDefault: false })!;
+
+    expect(chart.centerLine).toBeCloseTo(1.128 * 2, 10);
+    expect(chart.lowerControlLimit).toBe(0);
+  });
+});

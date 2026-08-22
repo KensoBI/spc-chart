@@ -43,3 +43,44 @@ describe('createMRChartXmR (moving range chart)', () => {
     expect(createMRChartXmR([])).toBeNull();
   });
 });
+
+describe('estimation options', () => {
+  const auto = { method: 'average-mr' as const, unbias: true, isDefault: true };
+
+  it('leaves the classic limits untouched on the default estimator', () => {
+    expect(createXChartXmR(DATA, auto)).toEqual(createXChartXmR(DATA));
+    expect(createMRChartXmR(DATA, auto)).toEqual(createMRChartXmR(DATA));
+  });
+
+  it('moves the center line to a historical mean', () => {
+    const chart = createXChartXmR(DATA, { ...auto, mean: 10 })!;
+
+    expect(chart.centerLine).toBe(10);
+    // Spread still comes from the data: ± 2.66 * 2.25.
+    expect(chart.upperControlLimit).toBeCloseTo(15.985, 10);
+  });
+
+  it('takes the spread straight from a historical sigma', () => {
+    const chart = createXChartXmR(DATA, { ...auto, sigma: 2, isDefault: false })!;
+
+    expect(chart.centerLine).toBeCloseTo(12.2, 10);
+    expect(chart.upperControlLimit).toBeCloseTo(18.2, 10);
+    expect(chart.lowerControlLimit).toBeCloseTo(6.2, 10);
+  });
+
+  it('narrows the limits when the median moving range ignores an outlying jump', () => {
+    // One large jump inflates the average moving range but not the median.
+    const spiky = [10, 11, 10, 40, 10, 11, 10];
+    const average = createXChartXmR(spiky)!;
+    const median = createXChartXmR(spiky, { method: 'median-mr', unbias: true, isDefault: false })!;
+
+    expect(median.upperControlLimit).toBeLessThan(average.upperControlLimit);
+  });
+
+  it('rescales the moving range chart from a historical sigma', () => {
+    const chart = createMRChartXmR(DATA, { ...auto, sigma: 2, isDefault: false })!;
+
+    expect(chart.centerLine).toBeCloseTo(1.128 * 2, 10);
+    expect(chart.lowerControlLimit).toBe(0);
+  });
+});

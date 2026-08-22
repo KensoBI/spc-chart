@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.4.0
+
+**New Features:**
+- **Sigma-zone control lines**: Two new computed control lines, ±1σ and ±2σ, are now available from the same "Add control line" dropdown as LCL/UCL/Mean. Their position is derived from each series' own control limits, so they update automatically as your data does, and they support the full control-line editor (color, width, fill).
+- **A first look at SPC Chart PRO**: The chart type list now shows the attribute chart types coming to the commercial **SPC Chart PRO** add-on — p, np, c, u, Laney p′, and Laney u′ — as disabled entries with a "PRO" badge, so you can see what's coming without it changing anything about your existing charts. The new "Control limits" section (below "SPC" in the panel editor) similarly reports which sigma estimator is currently in force and previews the "Custom…" estimation mode that PRO will unlock.
+
+**Under the hood (engine groundwork for SPC Chart PRO):**
+- **Selectable sigma estimators and historical parameters**: The calculation engine can now derive a chart's center line and control limits from a chosen estimator (R̄/d2, S̄/c4, pooled standard deviation, or average moving range) and from a known historical mean/sigma instead of the data, and Cp/Cpk now follow the same estimator as the chart's own limits. This is driven entirely by panel JSON today — SPC Chart PRO will add the editor — and when left at "Automatic" every chart keeps its existing tabulated-constant formulas, so current dashboards are unaffected.
+- **Point exclusion ("omit from estimation")**: The pipeline can now drop specific points out of the control-limit, run-rule, and capability calculations while keeping them plotted, Minitab-style. There's no in-panel way to mark a point excluded yet — that arrives with SPC Chart PRO's point-level tools — but the free panel already renders the result correctly for any panel that has them set.
+- **Staged control limits**: Similarly, a series can now be split at process-change breakpoints so the center line and limits are recomputed independently per stage and rendered as a stepped line, matching Minitab's "stages." As with exclusions, only SPC Chart PRO will add a way to set breakpoints; if a subgroup-size change would make existing breakpoints or excluded points meaningless, the panel now clears them automatically rather than silently going stale.
+- **Multi-series chart types**: Chart type definitions can now emit extra plotted series that share their primary field's control limits (for example, the upper/lower sums of a CUSUM chart), laying groundwork for the multi-line chart types planned for SPC Chart PRO.
+
+### Bug Fixes
+- **Tooltip no longer blinks on dashboards with a shared crosshair or tooltip**: With the dashboard time-range option "Shared crosshair"/"Shared tooltip" on, the panel got caught in a cursor-sync feedback loop the first time the pointer left the plot: it reacted to its own hover-clear events and reset the uPlot cursor about ten times a second for as long as the panel stayed mounted. The tooltip was then torn down roughly 100ms after every time it opened, so it flickered whenever a point was hovered again, and the crosshair sent from other panels was wiped out as well. The panel now ignores the hover events it published itself, so both the tooltip and shared crosshair behave.
+- **Feature queries are selectable again**: The "Feature queries" option, which marks queries as reference-only so they are excluded from SPC statistics, was documented but never registered in the panel editor — it could only be set by hand-editing the panel JSON. It now appears in the **SPC** section. Existing panels that already carry `featureQueryRefIds` keep working exactly as before. ([#65](https://github.com/KensoBI/spc-chart/issues/65))
+- **Correct statistics when one query returns several frames**: A query can return multiple data frames that share a refId but hold different measurements (for example a Prometheus query with several label sets, or a datasource that splits series by timestamp). The statistics table matched raw data and spec limits by refId, so every such frame reused the first frame's values — showing wrong n, Mean, Std Dev, Min, Max and capability indices. Each frame is now matched to its own data by position, keeping frames with a shared refId distinct.
+
 ## 2.3.0
 
 **New Features:**

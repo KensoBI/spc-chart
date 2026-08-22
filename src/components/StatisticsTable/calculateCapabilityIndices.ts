@@ -1,9 +1,11 @@
 import { DataFrame, Field, FieldType } from '@grafana/data';
 import { Options, ControlLine } from 'panelcfg';
 import { ControlLineReducerId } from 'data/spcReducers';
-import { PositionInput } from 'types';
+import { PositionInput, SPC_COMPANION_SERIES } from 'types';
 import { estimateSigmaWithin, calculateCapability } from 'calcs/capability';
 import { calculateStandardStats } from 'calcs/standard';
+import { resolveEstimation } from 'data/estimation';
+import { resolveExclusions } from 'data/exclusions';
 import { getChartType } from 'registry/chartTypes';
 import 'registry/builtinChartTypes';
 
@@ -52,6 +54,10 @@ export function calculateSeriesStatistics(
   // Exclude it so statistics describe the plotted values rather than the X positions.
   const xFieldName = options.xField;
 
+  // Resolve each plotted frame's index in the full array once, preserving a unique mapping even
+  // when frames share a refId — a refId identifies the query, not the frame (see mapToFullIndices).
+  const fullIndices = mapToFullIndices(series, allSeries);
+
   return series.flatMap((frame, seriesIndex) => {
     // Only frames that are actually plotted contribute statistics. This mirrors the chart's
     // graphable-frame rule (prepareGraphableFields): in time mode a plotted frame needs a time
@@ -64,7 +70,10 @@ export function calculateSeriesStatistics(
 
     // A single frame can carry several value fields (wide format, e.g. one query returning
     // `sample, part_a, part_b`); each is plotted as its own line and gets its own table row.
-    const valueFields = frame.fields.filter((f) => f.type === FieldType.number && f.name !== xFieldName);
+    // Companion series (e.g. the CUSUM lower sum) share the primary's row and are skipped.
+    const valueFields = frame.fields.filter(
+      (f) => f.type === FieldType.number && f.name !== xFieldName && !f.config?.custom?.[SPC_COMPANION_SERIES]
+    );
 
     if (valueFields.length === 0) {
       return [emptyStatistics(frame.name || `Series ${seriesIndex}`, seriesIndex)];
@@ -72,16 +81,31 @@ export function calculateSeriesStatistics(
 
     // Extract USL/LSL for this series. Control-line seriesIndex is expressed in terms of the
     // full frame array, so map this data frame back to its index there before matching.
-    const fullIndex = indexOfFrame(allSeries, frame, seriesIndex);
-    const { lsl, usl } = selectSpecLimits(specLimits, fullIndex);
-    const rawFrame = findRawFrame(rawSeries, frame, seriesIndex);
+    const { lsl, usl } = selectSpecLimits(specLimits, fullIndices[seriesIndex]);
+    // Raw frames are aligned 1:1 with the plotted frames, so position is the unique counterpart.
+    const rawFrame = rawSeries?.[seriesIndex];
 
     return valueFields.map((numericField) => {
       // Control chart limits belong to the plotted chart, computed by doSpcCalcs.
       const chartCalcs = numericField.state?.calcs;
 
       // Everything else describes the raw individual observations of this same field.
-      const rawField = findRawFieldByName(rawFrame, numericField.name) ?? numericField;
+      let rawField = findRawFieldByName(rawFrame, numericField.name) ?? numericField;
+
+      // Excluded points (chartOptions.excludedPoints) drop out of the
+      // capability statistics as well, Minitab-style. Against a raw frame the
+      // excluded plotted point maps back to its subgroup's rows; without one
+      // the values are the plotted points themselves.
+      const exclusionFrame = rawFrame ?? frame;
+      const exclusionSubgroup = rawFrame ? Math.max(options.subgroupSize ?? 1, 1) : 1;
+      const exclusions = resolveExclusions(exclusionFrame, numericField.name, options, exclusionSubgroup);
+      if (exclusions) {
+        rawField = {
+          ...rawField,
+          values: rawField.values.filter((_: unknown, i: number) => !exclusions.rawRows.has(i)),
+        };
+      }
+
       const rawStats = calculateStandardStats(rawField);
       const mean = rawStats.mean ?? null;
       const sigmaOverall = rawStats.stdDev ?? null;
@@ -96,7 +120,14 @@ export function calculateSeriesStatistics(
             options,
             chartOptions: options.chartOptions,
           })
-        : estimateSigmaWithin(rawValues, options.chartType, options.subgroupSize);
+        : estimateSigmaWithin(
+            rawValues,
+            options.chartType,
+            options.subgroupSize,
+            chartTypeDef?.sigmaMethods
+              ? resolveEstimation(options.chartOptions, chartTypeDef.sigmaMethods)
+              : undefined
+          );
 
       const { cp, cpk, pp, ppk } = calculateCapability(mean, sigmaWithin, sigmaOverall, lsl, usl);
 
@@ -129,18 +160,6 @@ function isPlottedFrame(frame: DataFrame, xFieldName: string | undefined): boole
     return frame.fields.some((f) => f.type === FieldType.number && f.name === xFieldName);
   }
   return frame.fields.some((f) => f.type === FieldType.time);
-}
-
-/** Find the raw counterpart of a plotted frame by refId, falling back to position. */
-function findRawFrame(
-  rawSeries: DataFrame[] | undefined,
-  frame: DataFrame,
-  seriesIndex: number
-): DataFrame | undefined {
-  if (!rawSeries) {
-    return undefined;
-  }
-  return (frame.refId != null ? rawSeries.find((f) => f.refId === frame.refId) : undefined) ?? rawSeries[seriesIndex];
 }
 
 /** Locate a value field within the raw frame by name so each plotted field maps to its own raw data. */
@@ -222,19 +241,39 @@ function selectSpecLimits(
   return { lsl: pick(ControlLineReducerId.lsl), usl: pick(ControlLineReducerId.usl) };
 }
 
-/** Locate a data frame within the full frame array by identity, then refId, falling back to `fallback`. */
-function indexOfFrame(allSeries: DataFrame[], frame: DataFrame, fallback: number): number {
-  const byIdentity = allSeries.indexOf(frame);
-  if (byIdentity >= 0) {
-    return byIdentity;
-  }
-  if (frame.refId != null) {
-    const byRefId = allSeries.findIndex((f) => f.refId === frame.refId);
-    if (byRefId >= 0) {
-      return byRefId;
+/**
+ * Map every frame in `series` to its index in `allSeries`, preserving a unique mapping even when
+ * several frames share a refId. `series` is an in-order subsequence of `allSeries` (only feature
+ * frames were removed), so we consume `allSeries` left to right: each plotted frame claims the next
+ * position that matches it by identity or refId. Advancing a cursor stops two frames with the same
+ * refId from both resolving to the first match, which is the bug a plain `findIndex` by refId causes.
+ * A frame with no match (arrays not aligned as expected) falls back to its own position in `series`.
+ */
+function mapToFullIndices(series: DataFrame[], allSeries: DataFrame[]): number[] {
+  const indices: number[] = [];
+  let cursor = 0;
+
+  for (let seriesIndex = 0; seriesIndex < series.length; seriesIndex++) {
+    const frame = series[seriesIndex];
+    let matched = -1;
+
+    for (let j = cursor; j < allSeries.length; j++) {
+      const candidate = allSeries[j];
+      if (candidate === frame || (frame.refId != null && candidate.refId === frame.refId)) {
+        matched = j;
+        break;
+      }
+    }
+
+    if (matched >= 0) {
+      indices.push(matched);
+      cursor = matched + 1;
+    } else {
+      indices.push(seriesIndex);
     }
   }
-  return fallback;
+
+  return indices;
 }
 
 function emptyStatistics(name: string, seriesIndex: number): SeriesStatistics {

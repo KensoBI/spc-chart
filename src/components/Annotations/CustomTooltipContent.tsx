@@ -1,18 +1,8 @@
 import React from 'react';
-import { DataFrame, getFieldDisplayName, formattedValueToString, FALLBACK_COLOR, FieldType, GrafanaTheme2 } from '@grafana/data';
+import { getFieldDisplayName, formattedValueToString, FALLBACK_COLOR, FieldType, GrafanaTheme2 } from '@grafana/data';
 import { Button, useStyles2 } from '@grafana/ui';
 import { css } from '@emotion/css';
-
-interface CustomTooltipContentProps {
-  data: DataFrame;
-  focusedSeriesIdx: number | null;
-  focusedPointIdx: number | null;
-  frames: DataFrame[];
-  timeZone: string;
-  onAddAnnotation?: (time: number) => void;
-  isPinned?: boolean;
-  onDismiss?: () => void;
-}
+import { SpcTooltipProps } from 'components/extensions';
 
 const getStyles = (theme: GrafanaTheme2) => ({
   container: css({
@@ -66,7 +56,8 @@ const getStyles = (theme: GrafanaTheme2) => ({
   }),
 });
 
-export const CustomTooltipContent: React.FC<CustomTooltipContentProps> = ({
+/** Default implementation of the tooltip seam (it ignores options/onOptionsChange). */
+export const CustomTooltipContent: React.FC<SpcTooltipProps> = ({
   data,
   focusedSeriesIdx,
   focusedPointIdx,

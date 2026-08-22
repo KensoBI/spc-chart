@@ -5,12 +5,16 @@ import { defaultGraphConfig, getGraphFieldConfig } from './config';
 import { defaultStatisticsTableColumns, FieldConfig, Options } from './panelcfg';
 import { StatisticsColumnEditor } from 'components/options/StatisticsColumnEditor';
 import { SpcChartTyp } from 'types';
+import { ChartTypeEditor } from 'components/options/ChartTypeEditor';
 import { SubgroupEditor } from 'components/options/SubgroupEditor';
 import { AggregationTypeEditor } from 'components/options/AggregationTypeEditor';
 import { ControlLineEditor } from 'components/options/ControlLineEditor';
+import { FeatureQueryEditor } from 'components/options/FeatureQueryEditor';
 import { migrateOptions } from 'migrations';
-import { listChartTypes } from 'registry/chartTypes';
+import { chartTypeHasFixedSubgroup } from 'registry/chartTypes';
 import 'registry/builtinChartTypes';
+import 'registry/proChartTypeStubs';
+import { addControlLimitsOptions } from 'registry/controlLimitsOptions';
 import { TimezonesEditor } from 'components/options/TimezonesEditor';
 import { XFieldEditor } from 'components/options/XFieldEditor';
 import { SpcChartPanel } from 'components/SpcChart';
@@ -20,18 +24,12 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
   .setMigrationHandler(migrateOptions)
   .useFieldConfig(getGraphFieldConfig(defaultGraphConfig))
   .setPanelOptions((builder) => {
-    builder.addSelect({
+    builder.addCustomEditor({
+      id: 'chartType',
       path: 'chartType',
       name: 'Chart type',
       description: 'Choose the type of control chart to generate',
-      settings: {
-        allowCustomValue: false,
-        options: [
-          { label: 'none', value: SpcChartTyp.none },
-          ...listChartTypes().map((chartType) => ({ label: chartType.label, value: chartType.id as SpcChartTyp })),
-        ],
-      },
-
+      editor: ChartTypeEditor,
       defaultValue: SpcChartTyp.none,
       category: ['SPC'],
     });
@@ -43,6 +41,8 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       editor: SubgroupEditor,
       defaultValue: 1,
       category: ['SPC'],
+      // Chart types locked to subgroup size 1 (XmR, attribute) have nothing to pick.
+      showIf: (option) => !chartTypeHasFixedSubgroup(option.chartType),
     });
 
     builder.addCustomEditor({
@@ -57,6 +57,16 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
     });
 
     builder.addCustomEditor({
+      id: 'featureQueryRefIds',
+      path: 'featureQueryRefIds',
+      name: 'Feature queries',
+      description: 'Select queries that act as reference-only datasets, excluded from SPC calculations.',
+      editor: FeatureQueryEditor,
+      defaultValue: [],
+      category: ['SPC'],
+    });
+
+    builder.addCustomEditor({
       id: 'controlLines',
       path: 'controlLines',
       name: 'Control lines',
@@ -65,6 +75,11 @@ export const plugin = new PanelPlugin<Options, FieldConfig>(SpcChartPanel)
       defaultValue: [],
       category: ['SPC'],
     });
+
+    // Its own collapsed section, directly below SPC: estimation settings are
+    // read rarely and changed rarely, and must not lengthen the section every
+    // user works in.
+    addControlLimitsOptions(builder);
 
     builder.addBooleanSwitch({
       path: 'showStatisticsTable',

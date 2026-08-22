@@ -39,6 +39,12 @@ export interface FieldConfig extends common.GraphFieldConfig {}
 export interface ControlLine {
   name: string;
   position?: number;
+  /**
+   * Per-point positions for computed lines whose value varies by subgroup
+   * (variable-limit attribute charts). Resolved at render time from
+   * field.state.calcs — never persisted in the panel JSON.
+   */
+  positionData?: Array<number | null>;
   field: string;
   positionInput: PositionInput;
   seriesIndex: number;

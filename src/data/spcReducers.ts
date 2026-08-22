@@ -1,5 +1,7 @@
 import { Field, FieldCalcs } from '@grafana/data';
 
+import { sigmaControlLineReducers } from './sigmaLines';
+
 export enum ControlLineReducerId {
   custom = 'custom',
   nominal = 'nominal',
@@ -122,4 +124,6 @@ export const controlLineReducers: ControlLineReducer[] = [
     isStandard: false,
     color: '#F2495C',
   },
+  // ±1σ / ±2σ sigma-zone lines — computed from each series' control limits.
+  ...sigmaControlLineReducers,
 ];

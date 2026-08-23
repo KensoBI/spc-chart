@@ -46,6 +46,25 @@ module.exports = [
     },
     rules: {
       '@typescript-eslint/no-deprecated': 'warn',
+      // Grafana asks plugins to keep the browser console clean. Report to the user with an
+      // AppEvents notification, or to Grafana's telemetry with logError/logWarning instead.
+      // `no-console` cannot express this: eslint merges rule options rather than replacing
+      // them, so the base config's allow list (log, warn, error, info) survives any severity
+      // we set here, and clearing it with `allow: []` fails the rule's own schema.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'MemberExpression[object.name="console"]',
+          message:
+            'Avoid console in plugin code: use an AppEvents notification for the user, or logError/logWarning from @grafana/runtime.',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-syntax': 'off',
     },
   },
   {

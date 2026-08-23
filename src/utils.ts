@@ -74,8 +74,8 @@ export function prepareGraphableFields(
   series: DataFrame[],
   theme: GrafanaTheme2,
   timeRange?: TimeRange,
-  // numeric X requires a single frame where the first field is numeric
-  xNumFieldIdx?: number,
+  // Numeric X-axis mode: the name of the X field. Numeric X requires it to be the first field of
+  // each frame, so it is looked up by name per frame and moved into place below.
   xFieldName?: string
 ): DataFrame[] {
   if (!series?.length) {
@@ -96,18 +96,14 @@ export function prepareGraphableFields(
 
   cacheFieldDisplayNames(series);
 
-  let useNumericX = xNumFieldIdx != null;
+  let useNumericX = xFieldName != null;
 
   // Make sure the numeric x field is first in each frame
   if (useNumericX) {
     series = series.map((frame) => {
-      // Find X field by name first (more reliable across different frames)
-      // Fall back to index for frames where we can't find by name
-      let xFieldIndex = xFieldName
-        ? frame.fields.findIndex((f) => f?.name === xFieldName)
-        : xNumFieldIdx!;
+      let xFieldIndex = frame.fields.findIndex((f) => f?.name === xFieldName);
 
-      // If not found by name and index is out of bounds, check if first field is already numeric (control line frames)
+      // If not found by name, check if first field is already numeric (control line frames)
       if (xFieldIndex < 0 || xFieldIndex >= frame.fields.length) {
         if (frame.fields[0]?.type === FieldType.number) {
           xFieldIndex = 0; // Already in correct position

@@ -1,5 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PanelProps, DashboardCursorSync, EventBus, FieldMatcherID, fieldMatchers, DataFrame } from '@grafana/data';
+import {
+  PanelProps,
+  DashboardCursorSync,
+  EventBus,
+  FieldMatcherID,
+  fieldMatchers,
+  DataFrame,
+  FieldType,
+} from '@grafana/data';
 import { config, PanelDataErrorView, locationService } from '@grafana/runtime';
 import {
   ContextMenu,
@@ -23,6 +31,7 @@ import {
   buildControlLineFrame,
   buildLimitAnnotations,
   computeControlLine,
+  findPlotXField,
 } from 'components/ControlLines/buildLimitAnnotations';
 import { LimitAnnotations } from 'components/ControlLines/LimitAnnotations';
 import { AlertAnnotations } from 'components/ControlLines/AlertAnnotations';
@@ -54,11 +63,7 @@ export const SpcChartPanel = ({
   onChangeTimeRange,
   extensions,
 }: SpcChartPanelProps) => {
-  const { sync, eventBus: panelEventBus } = usePanelContext();
-
-  // See PanelLocalEventBus: the deprecated GraphNG we render still reacts to the panel's
-  // own hover/clear events, which loops against EventBusPlugin and makes the tooltip blink.
-  const eventBus = useMemo(() => new PanelLocalEventBus(panelEventBus), [panelEventBus]);
+  const { sync, eventsScope, eventBus: panelEventBus } = usePanelContext();
 
   const optionsWithVars = useSubgroupSizeOptions(options).options;
 
@@ -107,26 +112,35 @@ export const SpcChartPanel = ({
     return match ? match[1] : undefined;
   }, []);
 
-  // Find numeric X field index if xField option is set
-  const xFieldIdx = useMemo(() => {
-    if (!optionsWithVars.xField) {
+  // Numeric X-axis mode, keyed by field name throughout. The name is matched per frame rather
+  // than resolved to one column index, so queries may return the X column in any position and
+  // may be returned in any order — a reference query that has no X column at all no longer
+  // decides the mode for the whole panel just by being the first query.
+  const xFieldName = useMemo(() => {
+    const name = optionsWithVars.xField;
+    if (!name) {
       return undefined;
     }
-    const frame = data.series[0];
-    if (!frame || !frame.fields) {
-      return undefined;
-    }
-    const idx = frame.fields.findIndex((f) => f && f.name === optionsWithVars.xField);
-    return idx >= 0 ? idx : undefined;
+    const found = data.series.some((frame) =>
+      frame?.fields?.some((f) => f && f.name === name && f.type === FieldType.number)
+    );
+    return found ? name : undefined;
   }, [optionsWithVars.xField, data.series]);
 
-  const useNumericX = xFieldIdx != null;
+  const useNumericX = xFieldName != null;
+
+  // See PanelLocalEventBus: keeps the panel from reacting to its own cursor events, and to
+  // hover events whose X value is measured in something other than this chart's X axis.
+  const eventBus = useMemo(
+    () => new PanelLocalEventBus(panelEventBus, useNumericX ? 'numeric' : 'time'),
+    [panelEventBus, useNumericX]
+  );
 
   // Full, post-calculation frame array (including feature frames): needed to resolve
   // series-based control lines whose value comes from a feature-series field.
   const samplesWithCalcs = useMemo(
-    () => doSpcCalcs(data.series, optionsWithVars, xFieldIdx),
-    [data.series, optionsWithVars, xFieldIdx]
+    () => doSpcCalcs(data.series, optionsWithVars, xFieldName),
+    [data.series, optionsWithVars, xFieldName]
   );
 
   // Post-calculation, feature-filtered frames: the process data series.
@@ -147,20 +161,18 @@ export const SpcChartPanel = ({
   }, [data.series, optionsWithVars.featureQueryRefIds]);
 
   const { frames, limitAnnotations, annotations } = useMemo(() => {
-    const controlLines = computeControlLine(samplesWithCalcs, optionsWithVars);
+    // Feature frames supply control-line values but are not process data: they resolve the lines
+    // (hence samplesWithCalcs below, which seriesIndex is expressed against) and are then left out
+    // of the plot, so a reference series is drawn as its control line and not as a series of its own.
+    const plottedPointCount = findPlotXField(samples, xFieldName)?.values.length;
+    const controlLines = computeControlLine(samplesWithCalcs, optionsWithVars, plottedPointCount);
     const limitAnnotations = buildLimitAnnotations(samplesWithCalcs, controlLines);
-    const controlLineFrames = buildControlLineFrame(samplesWithCalcs, controlLines, fieldConfig, xFieldIdx);
-    const combined = samplesWithCalcs.concat(controlLineFrames);
-    const preped = prepareGraphableFields(
-      combined,
-      config.theme2,
-      useNumericX ? undefined : timeRange,
-      xFieldIdx,
-      optionsWithVars.xField
-    );
+    const controlLineFrames = buildControlLineFrame(samples, controlLines, fieldConfig, xFieldName, samplesWithCalcs);
+    const combined = samples.concat(controlLineFrames);
+    const preped = prepareGraphableFields(combined, config.theme2, useNumericX ? undefined : timeRange, xFieldName);
 
     return { frames: preped, limitAnnotations, annotations: data.annotations };
-  }, [samplesWithCalcs, data.annotations, fieldConfig, optionsWithVars, timeRange, xFieldIdx, useNumericX]);
+  }, [samples, samplesWithCalcs, data.annotations, fieldConfig, optionsWithVars, timeRange, xFieldName, useNumericX]);
 
   const timezones = useMemo(() => getTimezones(options.timezone, timeZone), [options.timezone, timeZone]);
   const cursorSync = sync?.() ?? DashboardCursorSync.Off;
@@ -372,6 +384,7 @@ export const SpcChartPanel = ({
                     config={uplotConfig}
                     hoverMode={options.tooltip.mode === 'multi' ? 1 : 0}
                     syncMode={cursorSync}
+                    syncScope={eventsScope}
                     render={(_plot, seriesIdxs, closestSeriesIdx, isPinned, dismiss) => {
                       // Get the focused point index from the series indices array
                       // seriesIdxs[0] is null (time field), so find the first non-null series index

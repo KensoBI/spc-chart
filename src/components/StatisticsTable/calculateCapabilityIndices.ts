@@ -6,6 +6,7 @@ import { estimateSigmaWithin, calculateCapability } from 'calcs/capability';
 import { calculateStandardStats } from 'calcs/standard';
 import { resolveEstimation } from 'data/estimation';
 import { resolveExclusions } from 'data/exclusions';
+import { resolveSeriesLinePosition } from 'data/seriesLimits';
 import { getChartType } from 'registry/chartTypes';
 import 'registry/builtinChartTypes';
 
@@ -203,18 +204,9 @@ function resolveSpecLimits(controlLines: ControlLine[] | undefined, allSeries: D
 
 function resolveControlLinePosition(cl: ControlLine, allSeries: DataFrame[]): number | null {
   if (cl.positionInput === PositionInput.series && cl.field) {
-    const frame = allSeries[cl.seriesIndex];
-    if (!frame) {
-      return null;
-    }
-    const field = frame.fields.find((f) => f.name === cl.field);
-    if (field && field.values.length > 0) {
-      const lastValue = field.values[field.values.length - 1];
-      if (typeof lastValue === 'number' && !Number.isNaN(lastValue)) {
-        return lastValue;
-      }
-    }
-    return null;
+    // Capability is computed against a single spec value; a variable limit contributes its
+    // first value, matching the constant position the chart labels the line with.
+    return resolveSeriesLinePosition(allSeries[cl.seriesIndex], cl.field)?.position ?? null;
   }
 
   return typeof cl.position === 'number' && !Number.isNaN(cl.position) ? cl.position : null;

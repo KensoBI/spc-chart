@@ -4,6 +4,7 @@ import { controlLineReducers } from 'data/spcReducers';
 import { PositionInput } from 'types';
 import { SeriesStatistics } from 'components/StatisticsTable/calculateCapabilityIndices';
 import { listStatisticsColumns, StatisticsColumnDefinition } from 'registry/statisticsColumns';
+import { resolveSeriesLinePosition } from 'data/seriesLimits';
 
 export interface ResolvedControlLine {
   name: string;
@@ -156,13 +157,7 @@ export function resolveControlLines(series: DataFrame[], options: Options): Reso
       }
       const numericField = findValueField(frame);
       seriesName = numericField?.config?.displayName || numericField?.name || frame.name || `Series ${seriesIndex}`;
-      const field = frame.fields.find((f) => f.name === cl.field);
-      if (field && field.values.length > 0) {
-        const lastValue = field.values[field.values.length - 1];
-        if (typeof lastValue === 'number') {
-          position = lastValue;
-        }
-      }
+      position = resolveSeriesLinePosition(frame, cl.field)?.position;
     } else {
       // Static position: like series-based lines, indexed against the full frame array.
       const frame = series[seriesIndex];

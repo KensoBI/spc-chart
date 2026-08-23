@@ -29,8 +29,8 @@ export const NullsThresholdInput = ({ value, onChange, inputPrefix, isTime }: Pr
         } else {
           val = Number(txt);
         }
-      } catch (err) {
-        console.warn('ERROR', err);
+      } catch {
+        // Unparseable input leaves val at false, which turns the threshold off.
       }
     }
     onChange(val);

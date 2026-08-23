@@ -56,9 +56,9 @@ export function plottedXValues(
   frame: DataFrame,
   subgroupSize: number,
   options: Options | undefined,
-  xFieldIdx?: number
+  xFieldName?: string
 ): Array<number | null> | null {
-  const xField = findXField(frame, xFieldIdx, options?.xField);
+  const xField = findXField(frame, xFieldName ?? options?.xField);
   if (!xField) {
     return null;
   }
@@ -243,13 +243,13 @@ export function resolveStageSegments(
   frame: DataFrame,
   options: Options | undefined,
   subgroupSize: number,
-  xFieldIdx?: number
+  xFieldName?: string
 ): StageSegment[] | null {
   const breakpoints = getStages(options);
   if (breakpoints.length === 0) {
     return null;
   }
-  const plottedX = plottedXValues(frame, subgroupSize, options, xFieldIdx);
+  const plottedX = plottedXValues(frame, subgroupSize, options, xFieldName);
   if (!plottedX) {
     return null;
   }

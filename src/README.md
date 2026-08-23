@@ -35,7 +35,8 @@ Control charts are the foundation of statistical process control. They separate 
 | Custom annotations | Create, edit, and delete annotations directly on the chart |
 | Threshold visualization | Display alert thresholds alongside SPC control limits |
 | Dashboard variables | Control subgroup size across multiple panels with a single `subgroupSize` variable |
-| Feature queries | Exclude reference queries from SPC calculations |
+| Feature queries | Mark queries as reference-only: consumed as control lines, excluded from SPC statistics |
+| Variable limits | Draw a stepped specification limit from a reference query carrying one value per point |
 | Statistics table | Optional summary table with per-series stats and process capability |
 
 ## Statistics Table

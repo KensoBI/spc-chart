@@ -19,9 +19,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
+  "id": 6,
   "links": [],
   "panels": [
     {
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
       "gridPos": {
         "h": 9,
         "w": 24,
@@ -35,10 +40,10 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# Feature queries\n\nA panel often mixes two kinds of query: the **measurements** being charted, and **reference queries** that only supply values to draw against \u2014 specification limits, a nominal target, limits looked up from a database. A reference query is still a real time series, so by default the panel treats it as process data: it is plotted in its own palette color with its own points, and it gets a row in the statistics table with a meaningless Mean, Std Dev and Cp/Cpk.\n\nThe **Feature queries** option (panel editor \u2192 **SPC** section) marks queries as reference-only. A declared refId is:\n\n- **consumed as a control line, not plotted as a series** \u2014 the values feed whichever control lines point at them, and the query itself is drawn only through those lines, in the color configured on the line;\n- **left out of the statistics table and the CSV export**;\n- **skipped by the SPC calculation** \u2014 the chart-type transform never runs over a spec limit;\n- **left out of the series numbering** that computed control lines (Mean/LCL/UCL/\u00b1\u03c3) index into.\n\nA **Series**-positioned control line reads its value from the reference field. If the field holds one value per plotted point and those values differ, the line becomes a **variable limit** and is drawn stepped; otherwise the field's **first** value is used as a constant. A reference query is a lookup, so the limit never drifts as rows are appended to it.\n\n> A reference query that returns **no time field** (a plain lookup such as `name,lsl,usl,nominal`) is already skipped by the statistics table automatically, since only plottable frames are tabulated. Feature queries are what you need when the reference data *is* a time series, as below.\n\n## What to verify\n\n| Panel | Expected |\n|---|---|\n| **Not set** | Three series drawn (`Bore diameter` plus two palette-colored spec series with their own points), **three rows** in the statistics table. This is the state reported in issue #65. |\n| **B, C declared** | One series drawn plus red LSL/USL lines at 9.85 / 10.15, **one row** in the statistics table, whose n / Mean / Std Dev / Min / Max / LCL / UCL / Cp / Cpk match the left panel's `Bore diameter` row exactly. |\n| **Variable limits** | The spec queries step up halfway through, so LSL and USL are drawn as **stepped red lines** (9.85 \u2192 9.70 and 10.15 \u2192 10.30) rather than flat ones, still with no extra series or table rows. |\n| **Numeric X-axis** | The reference query is refId **A** and has no `sample` column at all, yet the X-axis is still the numeric sample index 1\u201312. The X field is located by name in whichever query carries it, so query order and column order do not matter. Previously the panel looked only at the first query's columns, so this fell back to a time axis and drew the measurement column as if it were an ordinary series. |\n\nAlso worth checking: open any panel's editor and confirm **SPC \u2192 Feature queries** lists A, B, C \u2014 before the fix the option was not in the UI at all. Right-click \u2192 **Download CSV**: only the left panel's export mentions the spec series.",
+        "content": "# Feature queries\n\nA panel often mixes two kinds of query: the **measurements** being charted, and **reference queries** that only supply values to draw against — specification limits, a nominal target, limits looked up from a database. A reference query is still a real time series, so by default the panel treats it as process data: it is plotted in its own palette color with its own points, and it gets a row in the statistics table with a meaningless Mean, Std Dev and Cp/Cpk.\n\nThe **Feature queries** option (panel editor → **SPC** section) marks queries as reference-only. A declared refId is:\n\n- **consumed as a control line, not plotted as a series** — the values feed whichever control lines point at them, and the query itself is drawn only through those lines, in the color configured on the line;\n- **left out of the statistics table and the CSV export**;\n- **skipped by the SPC calculation** — the chart-type transform never runs over a spec limit;\n- **left out of the series numbering** that computed control lines (Mean/LCL/UCL/±σ) index into.\n\nA **Series**-positioned control line reads its value from the reference field. If the field holds one value per plotted point and those values differ, the line becomes a **variable limit** and is drawn stepped; otherwise the field's **first** value is used as a constant. A reference query is a lookup, so the limit never drifts as rows are appended to it.\n\n> A reference query that returns **no time field** (a plain lookup such as `name,lsl,usl,nominal`) is already skipped by the statistics table automatically, since only plottable frames are tabulated. Feature queries are what you need when the reference data *is* a time series, as below.\n\n## What to verify\n\n| Panel | Expected |\n|---|---|\n| **Not set** | Three series drawn (`Bore diameter` plus two palette-colored spec series with their own points), **three rows** in the statistics table. This is the state reported in issue #65. |\n| **B, C declared** | One series drawn plus red LSL/USL lines at 9.85 / 10.15, **one row** in the statistics table, whose n / Mean / Std Dev / Min / Max / LCL / UCL / Cp / Cpk match the left panel's `Bore diameter` row exactly. |\n| **Variable limits** | The spec queries step up halfway through, so LSL and USL are drawn as **stepped red lines** (9.85 → 9.70 and 10.15 → 10.30) rather than flat ones, still with no extra series or table rows. |\n| **Numeric X-axis** | The reference query is refId **A** and has no `sample` column at all, yet the X-axis is still the numeric sample index 1–12. The X field is located by name in whichever query carries it, so query order and column order do not matter. Previously the panel looked only at the first query's columns, so this fell back to a time axis and drew the measurement column as if it were an ordinary series. |\n\nAlso worth checking: open any panel's editor and confirm **SPC → Feature queries** lists A, B, C — before the fix the option was not in the UI at all. Right-click → **Download CSV**: only the left panel's export mentions the spec series.",
         "mode": "markdown"
       },
-      "pluginVersion": "2.4.0",
+      "pluginVersion": "11.6.10",
       "title": "",
       "transparent": true,
       "type": "text"
@@ -54,12 +59,50 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": []
@@ -68,11 +111,16 @@
         "h": 17,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 1,
       "options": {
         "aggregationType": "none",
+        "chartOptions": {
+          "estimation": {
+            "mode": "auto"
+          }
+        },
         "chartType": "X-XmR",
         "controlLines": [
           {
@@ -157,6 +205,7 @@
         ],
         "subgroupSize": 1,
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
@@ -194,7 +243,7 @@
           "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
         }
       ],
-      "title": "Feature queries NOT set \u2014 spec queries plotted as series",
+      "title": "Feature queries NOT set — spec queries plotted as series",
       "type": "kensobi-spc-panel"
     },
     {
@@ -208,12 +257,50 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": []
@@ -222,11 +309,16 @@
         "h": 17,
         "w": 12,
         "x": 12,
-        "y": 8
+        "y": 9
       },
       "id": 2,
       "options": {
         "aggregationType": "none",
+        "chartOptions": {
+          "estimation": {
+            "mode": "auto"
+          }
+        },
         "chartType": "X-XmR",
         "controlLines": [
           {
@@ -314,6 +406,7 @@
         ],
         "subgroupSize": 1,
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
@@ -351,7 +444,7 @@
           "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
         }
       ],
-      "title": "Feature queries = B, C \u2014 spec queries consumed as control lines",
+      "title": "Feature queries = B, C — spec queries consumed as control lines",
       "type": "kensobi-spc-panel"
     },
     {
@@ -365,12 +458,50 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": []
@@ -379,11 +510,16 @@
         "h": 17,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 26
       },
       "id": 3,
       "options": {
         "aggregationType": "none",
+        "chartOptions": {
+          "estimation": {
+            "mode": "auto"
+          }
+        },
         "chartType": "X-XmR",
         "controlLines": [
           {
@@ -445,6 +581,7 @@
         ],
         "subgroupSize": 1,
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         }
@@ -482,7 +619,7 @@
           "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3"
         }
       ],
-      "title": "Variable limits \u2014 spec queries carrying one value per point (tolerance widens halfway)",
+      "title": "Variable limits — spec queries carrying one value per point (tolerance widens halfway)",
       "type": "kensobi-spc-panel"
     },
     {
@@ -496,12 +633,50 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           }
         },
         "overrides": []
@@ -510,15 +685,20 @@
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 43
       },
       "id": 4,
       "options": {
         "aggregationType": "none",
+        "chartOptions": {
+          "estimation": {
+            "mode": "auto"
+          }
+        },
         "chartType": "X-XmR",
         "controlLines": [
           {
-            "field": "",
+            "field": "bore",
             "fillDirection": 0,
             "fillOpacity": 0,
             "lineColor": "#37872D",
@@ -601,6 +781,7 @@
         ],
         "subgroupSize": 1,
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
         },
@@ -627,12 +808,12 @@
           "scenarioId": "csv_content"
         }
       ],
-      "title": "Numeric X-axis with the reference query first \u2014 X column found by name, in any query",
+      "title": "Numeric X-axis with the reference query first — X column found by name, in any query",
       "type": "kensobi-spc-panel"
     }
   ],
   "preload": false,
-  "schemaVersion": 40,
+  "schemaVersion": 41,
   "tags": [
     "spc",
     "regression",
@@ -649,6 +830,5 @@
   "timezone": "browser",
   "title": "Feature queries (issue #65)",
   "uid": "spc-feature-queries",
-  "version": 1,
-  "weekStart": ""
+  "version": 1
 }

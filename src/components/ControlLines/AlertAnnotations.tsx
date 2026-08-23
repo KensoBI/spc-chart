@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import uPlot from 'uplot';
-import { DataFrame, FieldType, dateTime, GrafanaTheme2 } from '@grafana/data';
+import { AppEvents, DataFrame, FieldType, dateTime, GrafanaTheme2 } from '@grafana/data';
+import { getAppEvents } from '@grafana/runtime';
 import { UPlotConfigBuilder, Portal, useStyles2, useTheme2, ConfirmModal } from '@grafana/ui';
 import { css } from '@emotion/css';
 import { AnnotationFormModal } from '../Annotations/AnnotationFormModal';
@@ -565,7 +566,12 @@ export const AlertAnnotations: React.FC<AlertAnnotationsPluginProps> = ({
         setPinnedIndex(null); // Unpin the tooltip
         onAnnotationChange?.({ id: deletedId, text: '', tags: undefined });
       } catch (err) {
-        console.error('Failed to delete annotation:', err);
+        // The delete is triggered from a confirm modal with nowhere to show an inline error,
+        // so report it the way Grafana reports failed writes: a notification the user sees.
+        getAppEvents().publish({
+          type: AppEvents.alertError.name,
+          payload: ['Failed to delete annotation', err instanceof Error ? err.message : String(err)],
+        });
       }
     }
   }, [selectedAnnotation, onAnnotationChange, plot]);

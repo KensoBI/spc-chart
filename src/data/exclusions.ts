@@ -40,11 +40,11 @@ export function excludedXSetForSeries(excluded: ExcludedPoint[], seriesName: str
   return set;
 }
 
-/** The x field of a frame: the explicit numeric X field when configured, else the time field. */
-export function findXField(frame: DataFrame, xFieldIdx?: number, xFieldName?: string): Field | undefined {
-  if (xFieldIdx != null && frame.fields[xFieldIdx]) {
-    return frame.fields[xFieldIdx];
-  }
+/**
+ * The x field of a frame: the explicit numeric X field when configured, else the time field.
+ * Matched by name, so a frame may carry the X column in any position.
+ */
+export function findXField(frame: DataFrame, xFieldName?: string): Field | undefined {
   if (xFieldName) {
     const byName = frame.fields.find((f) => f.name === xFieldName);
     if (byName) {
@@ -167,13 +167,13 @@ export function resolveExclusions(
   fieldName: string,
   options: Options | undefined,
   subgroupSize: number,
-  xFieldIdx?: number
+  xFieldName?: string
 ): ResolvedExclusions | null {
   const excludedX = excludedXSetForSeries(getExcludedPoints(options), fieldName);
   if (excludedX.size === 0) {
     return null;
   }
-  const xField = findXField(frame, xFieldIdx, options?.xField);
+  const xField = findXField(frame, xFieldName ?? options?.xField);
   if (!xField) {
     return null;
   }

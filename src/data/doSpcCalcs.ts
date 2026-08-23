@@ -11,7 +11,7 @@ import { applyStagesToChartData, resolveStageSegments } from './stages';
 import 'registry/builtinChartTypes';
 
 //apply data aggregations to all series and save results in field state as FieldCalcs
-export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: number): DataFrame[] {
+export function doSpcCalcs(series: DataFrame[], options: Options, xFieldName?: string): DataFrame[] {
   const subgroupSize = options.subgroupSize < 1 ? 1 : options.subgroupSize;
   const aggregationType = options.aggregationType ?? AggregationType.none;
   const standardReducers = controlLineReducers.filter((p) => p.isStandard).map((p) => p.id);
@@ -19,6 +19,12 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
   const activeChartType = getChartType(options.chartType);
 
   return series.map((frame, frameIndex) => {
+    // Reference (feature) queries only supply values to control lines. They are neither plotted
+    // nor tabulated, so the chart-type transform must not run over them — a spec limit is not a
+    // process statistic — but they still fold into subgroups like the time field does, so a
+    // per-point reference value stays aligned with the point it belongs to.
+    const isFeatureFrame = options.featureQueryRefIds?.includes(frame.refId!) ?? false;
+
     const shouldCalculateStandardStats =
       options.controlLines.filter((c) => standardReducers.includes(c.reducerId)).length > 0;
 
@@ -56,8 +62,9 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
 
         const updatedField = { ...field };
 
-        // Check if this is the numeric X field (for trend/numeric x-axis mode)
-        const isNumericXField = xFieldIdx !== undefined && frame.fields.indexOf(field) === xFieldIdx;
+        // Check if this is the numeric X field (for trend/numeric x-axis mode). Matched by name
+        // per frame: queries need not agree on column order for the X field to be recognised.
+        const isNumericXField = xFieldName !== undefined && field.name === xFieldName;
 
         // Aggregate time field or numeric X field when using subgroups
         if (updatedField.type === FieldType.time || isNumericXField) {
@@ -66,6 +73,11 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
           if (isNumericXField) {
             return updatedField;
           }
+        }
+
+        if (isFeatureFrame && field.type === FieldType.number && !isNumericXField) {
+          updatedField.values = aggregateSeries(updatedField.values, subgroupSize, AggregationType.Mean);
+          return updatedField;
         }
 
         if (field.type === FieldType.number && !isNumericXField) {
@@ -88,7 +100,7 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
           // drop out of the calculations: the limits and center line are
           // recomputed on a copy of the frame with the excluded rows removed.
           const exclusions = controlChartData
-            ? resolveExclusions(frame, field.name, options, subgroupSize, xFieldIdx)
+            ? resolveExclusions(frame, field.name, options, subgroupSize, xFieldName)
             : null;
 
           // Stages (chartOptions.stages) split the series at process-change
@@ -97,7 +109,7 @@ export function doSpcCalcs(series: DataFrame[], options: Options, xFieldIdx?: nu
           // compose. Without stages, exclusion alone recomputes the limits on
           // the exclusion-filtered rows.
           const stageSegments = controlChartData
-            ? resolveStageSegments(frame, options, subgroupSize, xFieldIdx)
+            ? resolveStageSegments(frame, options, subgroupSize, xFieldName)
             : null;
           if (controlChartData && stageSegments) {
             controlChartData = applyStagesToChartData(

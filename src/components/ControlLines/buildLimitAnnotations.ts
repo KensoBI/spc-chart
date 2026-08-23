@@ -1,6 +1,7 @@
-import { DataFrame, FieldConfigSource, FieldType } from '@grafana/data';
+import { DataFrame, Field, FieldConfigSource, FieldType } from '@grafana/data';
 import { ControlLine, Options } from 'panelcfg';
 import { controlLineReducers } from 'data/spcReducers';
+import { resolveSeriesLinePosition } from 'data/seriesLimits';
 import { Flag, LimitAnnotation, LimitAnnotationConfig, Region } from './LimitAnnotations';
 import { PositionInput } from 'types';
 import {
@@ -12,46 +13,66 @@ import {
   LineInterpolation,
 } from '@grafana/schema';
 
-export function computeControlLine(series: DataFrame[], options: Options): ControlLine[] {
+/**
+ * @param plottedPointCount Number of points on the plotted x-axis. A "Series" control line whose
+ *                          reference field carries exactly this many differing values becomes a
+ *                          variable (stepped) limit; see resolveSeriesLinePosition.
+ */
+export function computeControlLine(series: DataFrame[], options: Options, plottedPointCount?: number): ControlLine[] {
   const controlLines = options.controlLines.map((cl) => ({ ...cl }));
 
   const computedControlLines = processComputedControlLines(series, controlLines, options.featureQueryRefIds);
-  const allControlLines = processNonComputedControlLines(series, computedControlLines);
+  const allControlLines = processNonComputedControlLines(series, computedControlLines, plottedPointCount);
 
   return allControlLines.filter((p) => p.position != null);
 }
 
+/**
+ * The x-axis the control lines are drawn against: the first plotted frame that carries one.
+ * Feature frames are not plotted, so they must not be offered here — their timestamps need not
+ * match the process data's.
+ */
+export function findPlotXField(plottedSeries: DataFrame[], xFieldName?: string): Field | null {
+  const useNumericX = xFieldName != null;
+
+  for (let dataframe of plottedSeries) {
+    if (useNumericX) {
+      // Find the numeric X field by name, so frames need not agree on column order
+      const field = dataframe.fields.find((f) => f.name === xFieldName && f.type === FieldType.number);
+      if (field) {
+        return field;
+      }
+    } else {
+      // Find the time field
+      const field = dataframe.fields.find(
+        (f) => f.type === FieldType.time && (!f.state || !f.state.hideFrom || !f.state.hideFrom.viz)
+      );
+      if (field) {
+        return field;
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * @param plottedSeries Frames that are actually drawn; supplies the x-axis of the control lines.
+ * @param allSeries     Full frame array including feature frames, which `seriesIndex` indexes into.
+ */
 export function buildControlLineFrame(
-  series: DataFrame[],
+  plottedSeries: DataFrame[],
   controlLines: ControlLine[],
   defaults: FieldConfigSource,
-  xFieldIdx?: number
+  xFieldName?: string,
+  allSeries: DataFrame[] = plottedSeries
 ): DataFrame[] {
   if (!controlLines.length) {
     return [];
   }
 
-  const useNumericX = xFieldIdx != null;
-  let xField = null;
-
-  for (let dataframe of series) {
-    if (useNumericX) {
-      // Find the numeric X field by index
-      const field = dataframe.fields[xFieldIdx];
-      if (field && field.type === FieldType.number) {
-        xField = field;
-        break;
-      }
-    } else {
-      // Find the time field
-      xField = dataframe.fields.find(
-        (field) => field.type === FieldType.time && (!field.state || !field.state.hideFrom || !field.state.hideFrom.viz)
-      );
-      if (xField) {
-        break;
-      }
-    }
-  }
+  const useNumericX = xFieldName != null;
+  const xField = findPlotXField(plottedSeries, xFieldName);
 
   let xValues: any[] = useNumericX ? [0] : [new Date().toISOString()]; // Default values
 
@@ -76,7 +97,7 @@ export function buildControlLineFrame(
     length: xValues.length,
   };
 
-  const allIndexes = series.map((_, index) => index);
+  const allIndexes = allSeries.map((_, index) => index);
 
   controlLines.forEach((cl, index) => {
     if (!allIndexes.includes(cl.seriesIndex)) {
@@ -157,11 +178,14 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
           break;
         }
       }
-      // Add region from the left
+      // Add region from the left. A variable limit contributes its per-point positions so the
+      // shaded area steps with the line instead of staying flat at the line's first value.
       const regionLeft: Region = {
         type: 'region',
         timeEnd: cl.position,
         timeStart: prevControlLine ? prevControlLine.position : undefined,
+        valuesEnd: cl.positionData,
+        valuesStart: prevControlLine?.positionData,
         title: cl.name,
         color: cl.lineColor,
         lineWidth: cl.lineWidth,
@@ -183,6 +207,8 @@ export function buildLimitAnnotations(series: DataFrame[], controlLines: Control
         type: 'region',
         timeStart: cl.position,
         timeEnd: nextControlLine ? nextControlLine.position : undefined,
+        valuesStart: cl.positionData,
+        valuesEnd: nextControlLine?.positionData,
         title: cl.name,
         color: cl.lineColor,
         lineWidth: cl.lineWidth,
@@ -265,25 +291,29 @@ function processComputedControlLines(
   return updatedControlLines;
 }
 
-function processNonComputedControlLines(series: DataFrame[], controlLines: ControlLine[]): ControlLine[] {
+function processNonComputedControlLines(
+  series: DataFrame[],
+  controlLines: ControlLine[],
+  plottedPointCount?: number
+): ControlLine[] {
   if (!controlLines || controlLines.length === 0) {
     return controlLines;
   }
 
-  series.map((frame, frameIndex) => {
-    controlLines.forEach((cl) => {
-      if (cl.positionInput === PositionInput.series && cl.seriesIndex === frameIndex) {
-        const field = frame.fields.find((f) => f.name === cl.field);
+  controlLines.forEach((cl) => {
+    if (cl.positionInput !== PositionInput.series) {
+      return;
+    }
 
-        if (field && field.values.length > 0) {
-          const lastValue = field.values[field.values.length - 1];
+    // seriesIndex is expressed against the full frame array, so the reference field may live
+    // in a feature frame; an out-of-range index simply yields no frame and leaves the line as is.
+    const resolved = resolveSeriesLinePosition(series[cl.seriesIndex], cl.field, plottedPointCount);
+    if (!resolved) {
+      return;
+    }
 
-          if (typeof lastValue === 'number') {
-            cl.position = lastValue;
-          }
-        }
-      }
-    });
+    cl.position = resolved.position;
+    cl.positionData = resolved.positionData;
   });
 
   return controlLines;

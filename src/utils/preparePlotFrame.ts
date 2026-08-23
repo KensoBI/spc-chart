@@ -1,4 +1,5 @@
 import { DataFrame, outerJoinDataFrames, FieldMatcher } from '@grafana/data';
+import { logError } from '@grafana/runtime';
 
 // Define the XYFieldMatchers type locally since it's not publicly exported
 export interface XYFieldMatchers {
@@ -34,7 +35,7 @@ export function preparePlotFrame(frames: DataFrame[], dimFields: XYFieldMatchers
 
     return joined;
   } catch (error) {
-    console.error('Error preparing plot frame:', error);
+    logError(error instanceof Error ? error : new Error(String(error)), { source: 'preparePlotFrame' });
     return frames[0]; // Fallback to first frame
   }
 }

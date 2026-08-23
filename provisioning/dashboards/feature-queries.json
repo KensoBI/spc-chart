@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Fixture for the Feature queries panel option (issue #65). Three queries: A = measurements, B and C = reference series carrying the spec limits. The two panels are identical except for featureQueryRefIds - left leaves it empty, right declares B and C as feature queries. Only the right panel's statistics table describes the process alone.",
+  "description": "Fixture for the Feature queries panel option (issue #65). Reference queries supply the specification limits: declared as feature queries they are consumed as control lines instead of being plotted as series of their own, and a reference query carrying one value per point becomes a variable (stepped) limit.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -23,7 +23,7 @@
   "panels": [
     {
       "gridPos": {
-        "h": 7,
+        "h": 9,
         "w": 24,
         "x": 0,
         "y": 0
@@ -35,7 +35,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# Feature queries\n\nA panel often mixes two kinds of query: the **measurements** you are charting, and **reference queries** that only supply values to draw against (spec limits, a nominal target, limits looked up from a database). Reference series are still real time series, so by default the panel treats them as process data: they get their own row in the statistics table, with a meaningless Mean, Std Dev and Cp/Cpk.\n\nThe **Feature queries** option (panel editor → **SPC** section) marks queries as reference-only. Declared refIds are dropped from the statistics table, from the CSV export, and from the series numbering that computed control lines (Mean/LCL/UCL/±σ) index into. They are still drawn on the chart — that is the point of a reference series.\n\n> Note: a reference query that returns **no time field** (a plain lookup table such as `name,lsl,usl,nominal`) is already skipped automatically, because the panel only tabulates frames it can plot. Feature queries are what you need when the reference data *is* a time series, as below.\n\n## Queries\n\n| refId | Alias | Role |\n|---|---|---|\n| A | `Bore diameter` | 24 measurements, process centred near 10.00 |\n| B | `LSL spec` | reference series, constant 9.85 |\n| C | `USL spec` | reference series, constant 10.15 |\n\n## What to verify\n\n1. **Left panel** (`Feature queries` empty): the statistics table has **three rows** — `Bore diameter`, `LSL spec`, `USL spec`. The two spec rows report a Std Dev of ~0 and no usable Cp/Cpk — they describe a constant, not a process. This is the state reported in issue #65.\n2. **Right panel** (`Feature queries` = B, C): the statistics table has **one row**, `Bore diameter`. Its n, Mean, Std Dev, Min, Max, LCL/UCL and Cp/Cpk are unchanged from the left panel — excluding the reference queries changes which rows appear, never the process numbers.\n3. **Both panels** draw the same three lines plus the same Mean/LCL/UCL control lines: the reference series stay visible.\n4. Open the right panel's editor: **SPC → Feature queries** is a multi-select listing A, B, C. Before the fix this option did not exist in the UI at all.\n5. Right-click each panel → **Download CSV**: the left export contains the two spec series, the right one does not.",
+        "content": "# Feature queries\n\nA panel often mixes two kinds of query: the **measurements** being charted, and **reference queries** that only supply values to draw against \u2014 specification limits, a nominal target, limits looked up from a database. A reference query is still a real time series, so by default the panel treats it as process data: it is plotted in its own palette color with its own points, and it gets a row in the statistics table with a meaningless Mean, Std Dev and Cp/Cpk.\n\nThe **Feature queries** option (panel editor \u2192 **SPC** section) marks queries as reference-only. A declared refId is:\n\n- **consumed as a control line, not plotted as a series** \u2014 the values feed whichever control lines point at them, and the query itself is drawn only through those lines, in the color configured on the line;\n- **left out of the statistics table and the CSV export**;\n- **skipped by the SPC calculation** \u2014 the chart-type transform never runs over a spec limit;\n- **left out of the series numbering** that computed control lines (Mean/LCL/UCL/\u00b1\u03c3) index into.\n\nA **Series**-positioned control line reads its value from the reference field. If the field holds one value per plotted point and those values differ, the line becomes a **variable limit** and is drawn stepped; otherwise the field's **first** value is used as a constant. A reference query is a lookup, so the limit never drifts as rows are appended to it.\n\n> A reference query that returns **no time field** (a plain lookup such as `name,lsl,usl,nominal`) is already skipped by the statistics table automatically, since only plottable frames are tabulated. Feature queries are what you need when the reference data *is* a time series, as below.\n\n## What to verify\n\n| Panel | Expected |\n|---|---|\n| **Not set** | Three series drawn (`Bore diameter` plus two palette-colored spec series with their own points), **three rows** in the statistics table. This is the state reported in issue #65. |\n| **B, C declared** | One series drawn plus red LSL/USL lines at 9.85 / 10.15, **one row** in the statistics table, whose n / Mean / Std Dev / Min / Max / LCL / UCL / Cp / Cpk match the left panel's `Bore diameter` row exactly. |\n| **Variable limits** | The spec queries step up halfway through, so LSL and USL are drawn as **stepped red lines** (9.85 \u2192 9.70 and 10.15 \u2192 10.30) rather than flat ones, still with no extra series or table rows. |\n| **Numeric X-axis** | The reference query is refId **A** and has no `sample` column at all, yet the X-axis is still the numeric sample index 1\u201312. The X field is located by name in whichever query carries it, so query order and column order do not matter. Previously the panel looked only at the first query's columns, so this fell back to a time axis and drew the measurement column as if it were an ordinary series. |\n\nAlso worth checking: open any panel's editor and confirm **SPC \u2192 Feature queries** lists A, B, C \u2014 before the fix the option was not in the UI at all. Right-click \u2192 **Download CSV**: only the left panel's export mentions the spec series.",
         "mode": "markdown"
       },
       "pluginVersion": "2.4.0",
@@ -68,7 +68,7 @@
         "h": 17,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 8
       },
       "id": 1,
       "options": {
@@ -194,7 +194,7 @@
           "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
         }
       ],
-      "title": "Feature queries NOT set — spec series pollute the statistics table",
+      "title": "Feature queries NOT set \u2014 spec queries plotted as series",
       "type": "kensobi-spc-panel"
     },
     {
@@ -222,7 +222,7 @@
         "h": 17,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 8
       },
       "id": 2,
       "options": {
@@ -290,7 +290,10 @@
             "seriesIndex": 2
           }
         ],
-        "featureQueryRefIds": ["B", "C"],
+        "featureQueryRefIds": [
+          "B",
+          "C"
+        ],
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -348,13 +351,293 @@
           "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15"
         }
       ],
-      "title": "Feature queries = B, C — statistics describe the process only",
+      "title": "Feature queries = B, C \u2014 spec queries consumed as control lines",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 3,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#37872D",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "LSL spec",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 1
+          },
+          {
+            "field": "USL spec",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 2
+          }
+        ],
+        "featureQueryRefIds": [
+          "B",
+          "C"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "cp",
+          "cpk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "2.4.0",
+      "targets": [
+        {
+          "alias": "Bore diameter",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.02,9.96,10.08,9.99,10.05,9.93,10.11,10.01,9.97,10.06,9.94,10.03,10.09,9.98,10.04,9.92,10.07,10,9.95,10.1,10.02,9.99,10.06,9.97"
+        },
+        {
+          "alias": "LSL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "B",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.85,9.7,9.7,9.7,9.7,9.7,9.7,9.7,9.7,9.7,9.7,9.7,9.7"
+        },
+        {
+          "alias": "USL spec",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "C",
+          "scenarioId": "csv_metric_values",
+          "stringInput": "10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.15,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3,10.3"
+        }
+      ],
+      "title": "Variable limits \u2014 spec queries carrying one value per point (tolerance widens halfway)",
+      "type": "kensobi-spc-panel"
+    },
+    {
+      "datasource": {
+        "type": "grafana-testdata-datasource",
+        "uid": "TestData"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 42
+      },
+      "id": 4,
+      "options": {
+        "aggregationType": "none",
+        "chartType": "X-XmR",
+        "controlLines": [
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#37872D",
+            "lineWidth": 2,
+            "name": "Mean",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "mean",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "UCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "ucl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "",
+            "fillDirection": 0,
+            "fillOpacity": 0,
+            "lineColor": "#FF9830",
+            "lineWidth": 2,
+            "name": "LCL",
+            "position": 0,
+            "positionInput": "Static",
+            "reducerId": "lcl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "lsl",
+            "fillDirection": -1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "LSL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "lsl",
+            "seriesIndex": 0
+          },
+          {
+            "field": "usl",
+            "fillDirection": 1,
+            "fillOpacity": 10,
+            "lineColor": "#C4162A",
+            "lineWidth": 2,
+            "name": "USL",
+            "position": 0,
+            "positionInput": "Series",
+            "reducerId": "usl",
+            "seriesIndex": 0
+          }
+        ],
+        "featureQueryRefIds": [
+          "A"
+        ],
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "showStatisticsTable": true,
+        "statisticsTableColumns": [
+          "n",
+          "mean",
+          "stdDev",
+          "min",
+          "max",
+          "lcl",
+          "ucl",
+          "cp",
+          "cpk"
+        ],
+        "subgroupSize": 1,
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "sample"
+      },
+      "pluginVersion": "2.4.0",
+      "targets": [
+        {
+          "csvContent": "name,usl,lsl\nBore diameter,10.15,9.85",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        },
+        {
+          "csvContent": "sample,bore\n1,10.02\n2,9.96\n3,10.08\n4,9.99\n5,10.05\n6,9.93\n7,10.11\n8,10.01\n9,9.97\n10,10.06\n11,9.94\n12,10.03",
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "TestData"
+          },
+          "refId": "B",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "Numeric X-axis with the reference query first \u2014 X column found by name, in any query",
       "type": "kensobi-spc-panel"
     }
   ],
   "preload": false,
   "schemaVersion": 40,
-  "tags": ["spc", "regression", "feature-queries"],
+  "tags": [
+    "spc",
+    "regression",
+    "feature-queries"
+  ],
   "templating": {
     "list": []
   },
